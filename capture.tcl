@@ -58,9 +58,9 @@ set fixed_N [expr $N/2]
 set equil_time [expr 10.0 * $N]
 set t_pore 1
 set z_line [expr $cz - $t_pore/2]
-set force [expr -20.0]
+set force [expr -10.0]
 set n_attempt 0
-
+set illegal_mov 0 
 
 
 
@@ -97,14 +97,14 @@ proc fbuild {} {
 		if { $i > 0 } {
 			part $i bond 0 [expr $i - 1]
 		}
-		if { $i > 1} {
-			part [expr $i - 1] bond 1 $i [expr $i - 2]
-		}
+		# if { $i > 1} {
+		# 	part [expr $i - 1] bond 1 $i [expr $i - 2]
+		# }
 	}
 }
 
 proc fequilibrate {} {
-	global fixed_N temp gamma gamma_equilibration equil_time
+	global fixed_N temp gamma gamma_equilibration equil_time illegal_mov
 
 	part $fixed_N fix
 
@@ -156,9 +156,9 @@ proc fmove {} {
 	set pz [lindex [part $min_part print pos] 2]
 
 
-	set mx [expr $cx + 20*[lindex $randlist 0]]
-	set my [expr $cy + 20*[lindex $randlist 1]]
-	set mz [expr $cz + 20*[lindex $randlist 2]]
+	set mx [expr $cx + 40*[lindex $randlist 0]]
+	set my [expr $cy + 40*[lindex $randlist 1]]
+	set mz [expr $cz + 40*[lindex $randlist 2]]
 
 	puts "$mx $my $mz"
 	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
@@ -178,20 +178,28 @@ proc fmove {} {
 	# for {set i 0} {$i < $N} {incr i} {
 	# 	part $i bond delete
 	# }
-
+	set tr [expr sqrt($tx*$tx + $ty*$ty + $tz*$tz)]
 
 	for { set i [expr 0] } { $i < $N } { incr i } {
 		if {$i != $min_part} {
 			set ix [expr [lindex [part $i print pos] 0] - $px + $tx] 
 			set iy [expr [lindex [part $i print pos] 1] - $py + $ty] 
 			set iz [expr [lindex [part $i print pos] 2] - $pz + $tz] 
+			set ir [expr sqrt($ix*$ix + $iy*$iy + $iz*$iz)]
 			#puts "$ix $iy $iz"
+			puts $ir
 			part $i pos $ix $iy $iz type 0 
 		}
 	}
 
 	set zlist {}
-
+	for {set i 0} {$i < $N} { incr i} {
+		set z [lindex [part $i print pos] 2]
+		if {$z < [expr $cz + $lj_cutoff]} {
+			puts "Nooooooo"
+			set illegal_mov 1
+		}
+	}
 
 
 	#integrate 100
@@ -208,7 +216,7 @@ proc frg_equil {} {
 
 
 proc fmd {} {
-	global N tmax z_line trans_flag t_trans cx cy cz nmax filename rseed n_attempt part_pos_trans part_pos_contact force lj_cutoff fixed_N temp gamma gamma_equilibration equil_time
+	global N tmax z_line trans_flag t_trans cx cy cz nmax filename rseed n_attempt part_pos_trans part_pos_contact force lj_cutoff fixed_N temp gamma gamma_equilibration equil_time illegal_mov
 
 	for {set i 0} {$i < $N} {incr i} {
 		part $i ext_force $force 1 1
@@ -227,6 +235,44 @@ proc fmd {} {
 		set y_list {}
 		set z_list {}
 		set r_list {}
+
+		for {set i 0 } {$i < $N} {incr i} {
+			set z [lindex [part $i print pos] 2]
+			puts "Times I fucked up: $illegal_mov"
+			if {$z < [expr $cz + $lj_cutoff] && $illegal_mov == 1} {
+				puts "Will be inside nanopore. Re-init"
+				
+				for {set i 0} {$i < $N} {incr i} {
+					part $i bond delete
+				}
+
+				for {set i 0} {$i < $N} {incr i} {
+					part $i ext_force 0 0 0
+				}
+
+				fbuild
+				
+				part $fixed_N fix
+
+				thermostat langevin $temp $gamma_equilibration
+				for {set i 0} {$i < $equil_time} {incr i} {
+				    
+				    integrate 100
+				    imd positions
+				
+				}
+				thermostat langevin $temp $gamma
+
+				part $fixed_N unfix
+				fmove
+				for {set i 0} {$i < $N} {incr i} {
+					part $i ext_force $force 1 1
+				}
+				set illegal_mov 0
+			}
+		}
+
+
 		for {set i 0} { $i < $N } {incr i} {
 			set x [lindex [part $i print pos] 0]
 			set y [lindex [part $i print pos] 1]
@@ -254,30 +300,17 @@ proc fmd {} {
 		#puts $rmin
 		#puts $r_min
 
-		for {set i 0 } {$i < $N} {incr i} {
-			set z [lindex [part $i print pos] 2]
-			if {$z < [expr $cz + $lj_cutoff]} {
-				puts "Will be inside nanopore. Re-init"
-				fbuild
-				
-				part $fixed_N fix
 
-				thermostat langevin $temp $gamma_equilibration
-				for {set i 0} {$i < $equil_time} {incr i} {
-				    
-				    integrate 100
-				    imd positions
-				
-				}
-				thermostat langevin $temp $gamma
-
-				part $fixed_N unfix
-				fmove
-			}
-		}
 
 		if { $r_min > 30.0} {
 			puts "Dist greater than r = 30 from pore"
+			for {set i 0} {$i < $N} {incr i} {
+				part $i ext_force 0 0 0
+			}
+
+			for {set i 0} {$i < $N} {incr i} {
+				part $i bond delete
+			}
 			fbuild
 			#fequilibrate
 
@@ -295,6 +328,9 @@ proc fmd {} {
 			part $fixed_N unfix
 			#frg_equil
 			fmove
+			for {set i 0} {$i < $N} {incr i} {
+				part $i ext_force $force 1 1
+			}
 			incr fail
 		} else {
 			incr success
@@ -374,6 +410,10 @@ proc fmd {} {
 	  
 		if {$t_trans != 0} { 
 			puts "I'm doing re-init"
+			for {set i 0} {$i < $N} {incr i} {
+				part $i ext_force 0 0 0
+			}
+
 			#re-init
 			fbuild
 			#fequilibrate
@@ -392,7 +432,9 @@ proc fmd {} {
 			part $fixed_N unfix
 			#frg_equil
 			fmove
-			
+			for {set i 0} {$i < $N} {incr i} {
+				part $i ext_force $force 1 1
+			}
 			set t_trans 0
 		}	
 
