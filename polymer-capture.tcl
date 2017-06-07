@@ -85,7 +85,7 @@ constraint pore center [expr $cx] [expr $cy] [expr $cz] axis 0 0 1 radius 1.5 le
 
 for { set i 0 } { $i < $N } { incr i } {
 	set x [expr $cx - $N/2 + $i]
-		set y [expr $cy]
+	set y [expr $cy]
 	set z [expr $cz  + 100]
 	part $i pos $x $y $z type 0 
 
@@ -171,16 +171,15 @@ while {$flag == 0} {
 	set pz [lindex [part $min_part print pos] 2]
 
 
-	set mx [expr $cx + 10*[lindex $randlist 0]]
-	set my [expr $cy + 10*[lindex $randlist 1]]
-	set mz [expr $cz + 10*[lindex $randlist 2]]
+	set mx [expr $cx + 20*[lindex $randlist 0]]
+	set my [expr $cy + 20*[lindex $randlist 1]]
+	set mz [expr $cz + 20*[lindex $randlist 2]]
 
 	puts "$mx $my $mz"
 	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
 	set mr [expr sqrt($mr2)]
 	puts $mr
-	#set mindist [analyze mindist 0 99]
-	#puts $mindist
+
 	puts $min_part
 	part $min_part pos $mx $my $mz type 0
 
@@ -226,16 +225,23 @@ while {$flag == 0} {
 		part $i ext_force $force 1 1
 	}
 
+	#puts "I'm back in the first while"
+	while {1} {
+		set z_list {}
+		set r_list {}		
+		if { $n > $nmax } {
+			puts "n > nmax"
+			set flag 1
+			puts "$fail $success"
+			break
+		}
 
-	while {true} {
 		for {set i 0} { $i < $N } {incr i} {
 			set x [lindex [part $i print pos] 0]
 			set y [lindex [part $i print pos] 1]
 			set z [lindex [part $i print pos] 2]
 			set r [expr sqrt(($x-$cx)*($x-$cx) + ($y-$cy)*($y-$cy) + ($z-$cz)*($z-$cz))]
 			#puts $r
-			lappend x_list $x
-			lappend y_list $y
 			lappend z_list $z
 			lappend r_list $r
 			#puts "hi, I'm getting particle positions"
@@ -281,36 +287,33 @@ while {$flag == 0} {
 				set trans_flag [expr $trans_flag + 1 ]
 			}
 		}
+		#puts $z_max
 		if {$z_max < $z_line} {
 			puts "zmax less than zline"
-			
 			set t_last_thread $t
 			puts $t_last_thread
 			set t_trans [expr $t_last_thread - $t_thread]
 			set trans_time [open "data/${filename}_$N/trans_time_$N-$rseed.dat" "a"]
 			puts $trans_time "$t_trans $N $t_first_thread $t_last_thread $t_thread"
-	    	close $trans_time
-	    	set rg_trans [open "data/${filename}_$N/rg_trans-$N-$rseed.dat" "a"]
-	      	puts $rg_trans "$rg_calc_trans $N $t_thread"
-	      	close $rg_trans
-	      	set thread_indexing [open "data/${filename}_$N/thread_indexing-$N-$rseed.dat" "a"]
-	      	puts $thread_indexing "$thread_index"
-	      	close $thread_indexing
-	      	set n_attempt 
+			close $trans_time
+			set rg_trans [open "data/${filename}_$N/rg_trans-$N-$rseed.dat" "a"]
+			puts $rg_trans "$rg_calc_trans $N $t_thread"
+			close $rg_trans
+			set thread_indexing [open "data/${filename}_$N/thread_indexing-$N-$rseed.dat" "a"]
+			puts $thread_indexing "$thread_index"
+			close $thread_indexing
+	      	set n_attempt 0
 	      	set rg_flag 0  
 			set n [expr $n + 1.0]
 			break
+		}
+		if {$t_trans != 0} {
+			set t_trans 0 
 		}
 		integrate 100
 		imd positions
 		
 		incr t
-		if { $n > $nmax } {
-			puts "n > nmax"
-			set flag 1
-			puts "$fail $success"
-		}
-
 	}
 }
 close $part_pos_contact
