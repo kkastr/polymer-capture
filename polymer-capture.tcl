@@ -1,20 +1,17 @@
-set N      [lindex $argv 0]
+set N [lindex $argv 0]
 set rseed  [lindex $argv 1]
 set filename [lindex $argv 2]
 set vis [lindex $argv 3]
 
-#set rseed 18
-t_random seed    $rseed
+
+t_random seed $rseed
 
 
-#puts $N
-
-
-#set N 20
 
 set boxx 400
 set boxy 400
-set boxz 400
+set boxz 400 
+
 set cx [expr $boxx/8.0]
 set cy [expr $boxy/8.0]
 set cz [expr $boxz/8.0]
@@ -23,11 +20,11 @@ set nmax 5
 set temp 1; set gamma 1.0; set gamma_equilibration 0.1
 
 
+
 setmd box_l $boxx $boxy $boxz
 setmd periodic 1 1 1
 setmd time_step 0.01; setmd skin 0.4
 thermostat langevin $temp $gamma
-
 
 
 #FENE potential
@@ -83,6 +80,9 @@ proc randgen {} {
 	return $randlist
 }
 
+part [expr $N] pos $cx $cy $cz type 99 fix
+constraint pore center [expr $cx] [expr $cy] [expr $cz] axis 0 0 1 radius 1.5 length 1 type 1
+
 for { set i 0 } { $i < $N } { incr i } {
 	set x [expr $cx - $N/2 + $i]
 		set y [expr $cy]
@@ -98,87 +98,222 @@ for { set i 0 } { $i < $N } { incr i } {
 	}
 }
 
-
-set rlist {}
-
-for {set j 0} {$j < $N} {incr j} {
-	set x [lindex [part $j print pos] 0]
-	set y [lindex [part $j print pos] 1]
-    set z [lindex [part $j print pos] 2]
-    set r [expr sqrt($x*$x + $y*$y + $z*$z)]
-    lappend rlist $r
+if { $vis == 1 } {
+    prepare_vmd_connection vmdout
+    imd listen 100
+    imd positions
 }
 
-set rmin [::tcl::mathfunc::min {*}$rlist]
-set rmax [::tcl::mathfunc::max {*}$rlist]
+set part_pos_contact [open "data/${filename}_$N/part_pos_contact-$N-$rseed.xyz" "a"]
+set part_pos_trans [open "data/${filename}_$N/part_pos_trans-$N-$rseed.xyz" "a"]
+set part_pos_z [open "data/${filename}_$N/part_pos_z-$N-$rseed.xyz" "a"]
+
+set flag 0
+set t 0	
+set n 0
+set rg_flag 0
+set fail 0
+set success 0
+set trans_flag 0
+
+while {$flag == 0} {
+
+	for { set i 0 } { $i < $N } { incr i } {
+		set x [expr $cx - $N/2 + $i]
+			set y [expr $cy]
+		set z [expr $cz  + 100]
+		part $i pos $x $y $z type 0 
+	}
+
+	part $fixed_N fix
+
+	thermostat langevin $temp $gamma_equilibration
+	for {set i 0} {$i < $equil_time} {incr i} {
+	    
+	    integrate 100
+	    imd positions
+	
+	}
+	thermostat langevin $temp $gamma
+
+	part $fixed_N unfix
+
+	set rlist {}
+
+	for {set j 0} {$j < $N} {incr j} {
+		set x [lindex [part $j print pos] 0]
+		set y [lindex [part $j print pos] 1]
+	    set z [lindex [part $j print pos] 2]
+	    set r [expr sqrt($x*$x + $y*$y + $z*$z)]
+	    lappend rlist $r
+	}
+
+	set rmin [::tcl::mathfunc::min {*}$rlist]
+	set rmax [::tcl::mathfunc::max {*}$rlist]
 
 
-for {set i 0} {$i < $N} {incr i} {
-    set z [lindex [part $i print pos] 2]
-    set y [lindex [part $i print pos] 1]
-    set x [lindex [part $i print pos] 0]
-    set r [expr sqrt($x*$x + $y*$y + $z*$z)]
-    if {$r == $rmin} {
-      set min_part $i
-    } 
-}
+	for {set i 0} {$i < $N} {incr i} {
+	    set z [lindex [part $i print pos] 2]
+	    set y [lindex [part $i print pos] 1]
+	    set x [lindex [part $i print pos] 0]
+	    set r [expr sqrt($x*$x + $y*$y + $z*$z)]
+	    if {$r == $rmin} {
+	      set min_part $i
+	    } 
+	}
 
 
-set randlist [randgen]
+	set randlist [randgen]
 
 
-set px [lindex [part $min_part print pos] 0]
-set py [lindex [part $min_part print pos] 1]
-set pz [lindex [part $min_part print pos] 2]
+	set px [lindex [part $min_part print pos] 0]
+	set py [lindex [part $min_part print pos] 1]
+	set pz [lindex [part $min_part print pos] 2]
 
 
-set mx [expr $cx + 40*[lindex $randlist 0]]
-set my [expr $cy + 40*[lindex $randlist 1]]
-set mz [expr $cz + 40*[lindex $randlist 2]]
+	set mx [expr $cx + 10*[lindex $randlist 0]]
+	set my [expr $cy + 10*[lindex $randlist 1]]
+	set mz [expr $cz + 10*[lindex $randlist 2]]
 
-puts "$mx $my $mz"
-set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
-set mr [expr sqrt($mr2)]
-puts $mr
-#set mindist [analyze mindist 0 99]
-#puts $mindist
-puts $min_part
-part $min_part pos $mx $my $mz type 0
+	puts "$mx $my $mz"
+	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
+	set mr [expr sqrt($mr2)]
+	puts $mr
+	#set mindist [analyze mindist 0 99]
+	#puts $mindist
+	puts $min_part
+	part $min_part pos $mx $my $mz type 0
 
-set tx [lindex [part $min_part print pos] 0]
-set ty [lindex [part $min_part print pos] 1]
-set tz [lindex [part $min_part print pos] 2]
+	set tx [lindex [part $min_part print pos] 0]
+	set ty [lindex [part $min_part print pos] 1]
+	set tz [lindex [part $min_part print pos] 2]
+	
+
+	#part $min_part fix
+	# for {set i 0} {$i < $N} {incr i} {
+	# 	part $i bond delete
+	# }
+	set tr [expr sqrt($tx*$tx + $ty*$ty + $tz*$tz)]
+
+	for { set i [expr 0] } { $i < $N } { incr i } {
+		if {$i != $min_part} {
+			set ix [expr [lindex [part $i print pos] 0] - $px + $tx] 
+			set iy [expr [lindex [part $i print pos] 1] - $py + $ty] 
+			set iz [expr [lindex [part $i print pos] 2] - $pz + $tz] 
+			set ir [expr sqrt($ix*$ix + $iy*$iy + $iz*$iz)]
+			#puts "$ix $iy $iz"
+			#puts $ir
+			part $i pos $ix $iy $iz type 0 
+		}
+	}
+
+	set zlist {}
+	for {set i 0} {$i < $N} { incr i} {
+		set z [lindex [part $i print pos] 2]
+		if {$z < [expr $cz + $lj_cutoff]} {
+			puts "Nooooooo"
+			set illegal_mov 1
+		}
+	}
+
+	if {$illegal_mov == 1} {
+		puts "Monomer will be inside pore"
+		set illegal_mov 0
+		continue
+	}
+
+	for {set i 0} {$i < $N} {incr i} {
+		part $i ext_force $force 1 1
+	}
 
 
-#part $min_part fix
-# for {set i 0} {$i < $N} {incr i} {
-# 	part $i bond delete
-# }
-set tr [expr sqrt($tx*$tx + $ty*$ty + $tz*$tz)]
+	while {true} {
+		for {set i 0} { $i < $N } {incr i} {
+			set x [lindex [part $i print pos] 0]
+			set y [lindex [part $i print pos] 1]
+			set z [lindex [part $i print pos] 2]
+			set r [expr sqrt(($x-$cx)*($x-$cx) + ($y-$cy)*($y-$cy) + ($z-$cz)*($z-$cz))]
+			#puts $r
+			lappend x_list $x
+			lappend y_list $y
+			lappend z_list $z
+			lappend r_list $r
+			#puts "hi, I'm getting particle positions"
+		}
+		set z_min [::tcl::mathfunc::min {*}$z_list]
+		set z_max [::tcl::mathfunc::max {*}$z_list]
+		set r_min [::tcl::mathfunc::min {*}$r_list]
+		set r_max [::tcl::mathfunc::max {*}$r_list]
 
-for { set i [expr 0] } { $i < $N } { incr i } {
-	if {$i != $min_part} {
-		set ix [expr [lindex [part $i print pos] 0] - $px + $tx] 
-		set iy [expr [lindex [part $i print pos] 1] - $py + $ty] 
-		set iz [expr [lindex [part $i print pos] 2] - $pz + $tz] 
-		set ir [expr sqrt($ix*$ix + $iy*$iy + $iz*$iz)]
-		#puts "$ix $iy $iz"
-		puts $ir
-		part $i pos $ix $iy $iz type 0 
+
+		if {$r_min > 30.0} {
+			puts "Dist greater than r = 30 from pore"
+			incr fail
+			break
+		}
+
+		if {$z_min < $z_line} {
+			
+			if {$trans_flag == 0 } {
+				#puts "inside translocation if"
+				set t_thread $t
+				
+				if { $n_attempt == 0 } {
+					puts "n_attempt $n_attempt"
+					set t_first_thread $t
+				
+	        
+					set n_attempt [expr $n_attempt + 1]
+				}
+				set rg_calc_trans [analyze rg 0 1 $N]
+
+				
+				puts $part_pos_trans "$N"
+	    		puts $part_pos_trans "Position trans starting $t_thread"
+	    		set n_cis 0
+				for {set l 0} {$l < $N} {incr l} {
+					puts $part_pos_trans "a$l [part $l print pos]"
+					set z [lindex [part $l print pos] 2]
+					if { $z <= $z_min } {
+						set thread_index $l
+					}
+				}
+				set trans_flag [expr $trans_flag + 1 ]
+			}
+		}
+		if {$z_max < $z_line} {
+			puts "zmax less than zline"
+			
+			set t_last_thread $t
+			puts $t_last_thread
+			set t_trans [expr $t_last_thread - $t_thread]
+			set trans_time [open "data/${filename}_$N/trans_time_$N-$rseed.dat" "a"]
+			puts $trans_time "$t_trans $N $t_first_thread $t_last_thread $t_thread"
+	    	close $trans_time
+	    	set rg_trans [open "data/${filename}_$N/rg_trans-$N-$rseed.dat" "a"]
+	      	puts $rg_trans "$rg_calc_trans $N $t_thread"
+	      	close $rg_trans
+	      	set thread_indexing [open "data/${filename}_$N/thread_indexing-$N-$rseed.dat" "a"]
+	      	puts $thread_indexing "$thread_index"
+	      	close $thread_indexing
+	      	set n_attempt 
+	      	set rg_flag 0  
+			set n [expr $n + 1.0]
+			break
+		}
+		integrate 100
+		imd positions
+		
+		incr t
+		if { $n > $nmax } {
+			puts "n > nmax"
+			set flag 1
+			puts "$fail $success"
+		}
+
 	}
 }
-
-set zlist {}
-
-for {set i 0} {$i < $N} { incr i} {
-	set z [lindex [part $i print pos] 2]
-	if {$z < [expr $cz + $lj_cutoff]} {
-		puts "Nooooooo - Overlap"
-		set illegal_mov 1
-	}
-}
-
-
-
-
+close $part_pos_contact
+close $part_pos_trans
+close $part_pos_z
 
