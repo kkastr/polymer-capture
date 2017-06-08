@@ -122,7 +122,7 @@ while {$flag == 0} {
 		set x [expr $cx - $N/2 + $i]
 		set y [expr $cy]
 		set z [expr $cz  + 100]
-		part $i pos $x $y $z type 0 
+		part $i pos $x $y $z type 0 ext_force 0 0 0 
 	}
 
 	part $fixed_N fix
