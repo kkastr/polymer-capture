@@ -16,7 +16,7 @@ set cx [expr $boxx/8.0]
 set cy [expr $boxy/8.0]
 set cz [expr $boxz/8.0]
 set tmax 10000
-set nmax 5
+set nmax 10
 set temp 1; set gamma 1.0; set gamma_equilibration 0.1
 
 
@@ -55,7 +55,7 @@ set fixed_N [expr $N/2]
 set equil_time [expr 10.0 * $N]
 set t_pore 1
 set z_line [expr $cz - $t_pore/2]
-set force [expr -10.0]
+set force [expr -5.0]
 set n_attempt 0
 set illegal_mov 0 
 
@@ -120,7 +120,7 @@ while {$flag == 0} {
 
 	for { set i 0 } { $i < $N } { incr i } {
 		set x [expr $cx - $N/2 + $i]
-			set y [expr $cy]
+		set y [expr $cy]
 		set z [expr $cz  + 100]
 		part $i pos $x $y $z type 0 
 	}
@@ -137,6 +137,12 @@ while {$flag == 0} {
 	thermostat langevin $temp $gamma
 
 	part $fixed_N unfix
+
+	puts "equilibrated."
+	set rg_equil [open "data/${filename}_$N/rg_equil-$N-$rseed" "a"]
+	set rg_calc [analyze rg 0 1 $N]
+	puts $rg_equil "$rg_calc $N"
+	close $rg_equil
 
 	set rlist {}
 
@@ -256,6 +262,12 @@ while {$flag == 0} {
 			puts "Dist greater than r = 30 from pore"
 			incr fail
 			break
+		}
+
+
+		if {$z_min > $z_line && $trans_flag == 1} {
+			puts "zmin greater than zline"
+			set trans_flag 0
 		}
 
 		if {$z_min < $z_line} {
