@@ -52,7 +52,7 @@ inter 1 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 set t_trans 0
 set trans_flag 0
 set fixed_N [expr $N/2]
-set equil_time [expr 10.0 * $N]
+set equil_time [expr 100.0 * $N]
 set t_pore 1
 set z_line [expr $cz - $t_pore/2]
 set force [expr -5.0]
@@ -107,7 +107,11 @@ if { $vis == 1 } {
 
 set part_pos_contact [open "data/${filename}_$N/part_pos_contact-$N-$rseed.xyz" "a"]
 set part_pos_trans [open "data/${filename}_$N/part_pos_trans-$N-$rseed.xyz" "a"]
-set part_pos_z [open "data/${filename}_$N/part_pos_z-$N-$rseed.xyz" "a"]
+#set part_pos_z [open "data/${filename}_$N/part_pos_z-$N-$rseed.xyz" "a"]
+set metric_csv [open "data/${filename}_$N/metric-${filename}.csv" "a+"]
+
+puts $metric_csv "N,tau,rgxtrans,rgytrans,rgztrans,rgxycorrtrans,rgxequil,rgyequil,rgzequil,rgxycorrequil,tfirstthread,tthread,tlastthread"
+
 
 set flag 0
 set t 0	
@@ -140,10 +144,10 @@ while {$flag == 0} {
 	part $fixed_N unfix
 
 	puts "equilibrated."
-	set rg_equil [open "data/${filename}_$N/rg_equil-$N-$rseed" "a"]
-	set rg_calc [analyze rg 0 1 $N]
-	puts $rg_equil "$rg_calc $N"
-	close $rg_equil
+	
+	set rg_at_equil [analyze rg 0 1 $N]
+
+	
 
 	set rlist {}
 
@@ -275,7 +279,7 @@ while {$flag == 0} {
 			
 			if {$trans_flag == 0 } {
 				#puts "inside translocation if"
-				set t_thread $t
+				set t_last_thread $t
 				
 				if { $n_attempt == 0 } {
 					puts "n_attempt $n_attempt"
@@ -289,13 +293,9 @@ while {$flag == 0} {
 				
 				puts $part_pos_trans "$N"
 	    		puts $part_pos_trans "Position trans starting $t_thread"
-	    		set n_cis 0
+	         
 				for {set l 0} {$l < $N} {incr l} {
 					puts $part_pos_trans "a$l [part $l print pos]"
-					set z [lindex [part $l print pos] 2]
-					if { $z <= $z_min } {
-						set thread_index $l
-					}
 				}
 				set trans_flag [expr $trans_flag + 1 ]
 			}
@@ -303,18 +303,12 @@ while {$flag == 0} {
 		#puts $z_max
 		if {$z_max < $z_line} {
 			puts "zmax less than zline"
-			set t_last_thread $t
+			set t_thread $t
 			puts $t_last_thread
-			set t_trans [expr $t_last_thread - $t_thread]
-			set trans_time [open "data/${filename}_$N/trans_time_$N-$rseed.dat" "a"]
-			puts $trans_time "$t_trans $N $t_first_thread $t_last_thread $t_thread"
-			close $trans_time
-			set rg_trans [open "data/${filename}_$N/rg_trans-$N-$rseed.dat" "a"]
-			puts $rg_trans "$rg_calc_trans $N $t_thread"
-			close $rg_trans
-			set thread_indexing [open "data/${filename}_$N/thread_indexing-$N-$rseed.dat" "a"]
-			puts $thread_indexing "$thread_index"
-			close $thread_indexing
+			set t_trans [expr $t_thread - $t_last_thread]
+		
+			puts $metrc_csv "$N,$t_trans,$rg_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread"
+
 	      	set n_attempt 0
 	      	set rg_flag 0  
 			set n [expr $n + 1.0]
@@ -331,5 +325,5 @@ while {$flag == 0} {
 }
 close $part_pos_contact
 close $part_pos_trans
-close $part_pos_z
-
+#close $part_pos_z
+close $metric_csv
