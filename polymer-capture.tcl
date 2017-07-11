@@ -125,13 +125,15 @@ set stuck 0
 
 while {$flag == 0} {
 
+	if {$position_flag == 1} {
 	for { set i 0 } { $i < $N } { incr i } {
 		set x [expr $cx - $N/2 + $i]
 		set y [expr $cy]
 		set z [expr $cz  + 100]
 		part $i pos $x $y $z type 0 ext_force 0 0 0 
 	}
-
+	set position_flag 0
+	}
 	part $fixed_N fix
 
 	thermostat langevin $temp $gamma_equilibration
@@ -268,12 +270,14 @@ while {$flag == 0} {
 		if {$r_min > 30.0} {
 			puts "Dist greater than r = 30 from pore"
 			incr fail
+			set position_flag 1
 			break
 		}
 
 		if {$t > $cutofftime} {
 			"cut off time exceeded - stuck event"
-			incr stuck 
+			incr stuck
+			set position_flag 1 
 			break
 		}
 
@@ -320,6 +324,7 @@ while {$flag == 0} {
 	      	set n_attempt 0
 	      	set rg_flag 0  
 			set n [expr $n + 1.0]
+			set position_flag 1
 			break
 		}
 		if {$t_trans != 0} {
