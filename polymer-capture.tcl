@@ -123,6 +123,8 @@ set success 0
 set trans_flag 0
 set stuck 0
 
+
+set position_flag 0
 while {$flag == 0} {
 
 	if {$position_flag == 1} {
