@@ -59,6 +59,7 @@ set force [expr -1.0]
 set n_attempt 0
 set illegal_mov 0 
 set rpore 1.5
+set cutofftime 1e6
 
 
 proc rand_range {min max} { 
@@ -120,6 +121,7 @@ set rg_flag 0
 set fail 0
 set success 0
 set trans_flag 0
+set stuck 0
 
 while {$flag == 0} {
 
@@ -269,6 +271,12 @@ while {$flag == 0} {
 			break
 		}
 
+		if {$t > $cutofftime} {
+			"cut off time exceeded - stuck event"
+			incr stuck 
+			break
+		}
+
 
 		if {$z_min > $z_line && $trans_flag == 1} {
 			puts "zmin greater than zline"
@@ -307,7 +315,7 @@ while {$flag == 0} {
 			puts $t_last_thread
 			set t_trans [expr $t_thread - $t_last_thread]
 		
-			puts $metrc_csv "$N,$t_trans,$rg_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread"
+			puts $metrc_csv "$N,$t_trans,$rg_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
 
 	      	set n_attempt 0
 	      	set rg_flag 0  
