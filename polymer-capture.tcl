@@ -8,13 +8,13 @@ t_random seed $rseed
 
 
 
-set boxx 400
-set boxy 400
-set boxz 400 
+set boxx 500
+set boxy 500
+set boxz 500 
 
-set cx [expr $boxx/8.0]
-set cy [expr $boxy/8.0]
-set cz [expr $boxz/8.0]
+set cx [expr $boxx/2.0]
+set cy [expr $boxy/2.0]
+set cz [expr $boxz/2.0]
 set tmax 10000
 set nmax 10
 set temp 1; set gamma 1.0; set gamma_equilibration 0.1
