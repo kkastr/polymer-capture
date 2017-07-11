@@ -53,8 +53,8 @@ set t_trans 0
 set trans_flag 0
 set fixed_N [expr $N/2]
 set equil_time [expr 100.0 * $N]
-set t_pore 1
-set z_line [expr $cz - $t_pore/2]
+set tpore 1
+set z_line [expr $cz - $tpore/2]
 set force [expr -5.0]
 set n_attempt 0
 set illegal_mov 0 
