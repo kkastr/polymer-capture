@@ -58,6 +58,7 @@ set z_line [expr $cz - $t_pore/2]
 set force [expr -5.0]
 set n_attempt 0
 set illegal_mov 0 
+set rpore 1.5
 
 
 proc rand_range {min max} { 
@@ -81,7 +82,7 @@ proc randgen {} {
 }
 
 part [expr $N] pos $cx $cy $cz type 99 fix
-constraint pore center [expr $cx] [expr $cy] [expr $cz] axis 0 0 1 radius 1.5 length 1 type 1
+constraint pore center [expr $cx] [expr $cy] [expr $cz] axis 0 0 1 radius $rpore length $tpore type 1
 
 for { set i 0 } { $i < $N } { incr i } {
 	set x [expr $cx - $N/2 + $i]
