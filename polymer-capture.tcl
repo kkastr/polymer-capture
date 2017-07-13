@@ -245,8 +245,8 @@ while {$flag == 0} {
 
 	}
 
-
 	#puts "I'm back in the first while"
+
 	while {1} {
 		for {set i 0} {$i < $N} {incr i} {
 			part $i ext_force $force 1 1
