@@ -52,7 +52,7 @@ inter 1 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 set t_trans 0
 set trans_flag 0
 set fixed_N [expr $N/2]
-set equil_time [expr 100.0 * $N]
+set equil_time [expr 1.0 * $N]
 set tpore 1
 set z_line [expr $cz - $tpore/2]
 set force [expr -1.0]
@@ -115,7 +115,7 @@ puts $metric_csv "N,tau,rgxtrans,rgytrans,rgztrans,rgxycorrtrans,rgxequil,rgyequ
 
 
 set flag 0
-set t 0	
+set t 0
 set n 0
 set rg_flag 0
 set fail 0
@@ -127,12 +127,17 @@ set stuck 0
 set position_flag 0
 while {$flag == 0} {
 
+
 	if {$position_flag == 1} {
+		for {set i 0} {$i < $N} {incr i} {
+			part $i ext_force 0 0 0
+		}
+
 	for { set i 0 } { $i < $N } { incr i } {
 		set x [expr $cx - $N/2 + $i]
 		set y [expr $cy]
 		set z [expr $cz  + 100]
-		part $i pos $x $y $z type 0 ext_force 0 0 0 
+		part $i pos $x $y $z type 0 
 	}
 	set position_flag 0
 	}
@@ -188,9 +193,9 @@ while {$flag == 0} {
 	set pz [lindex [part $min_part print pos] 2]
 
 
-	set mx [expr $cx + 20*[lindex $randlist 0]]
-	set my [expr $cy + 20*[lindex $randlist 1]]
-	set mz [expr $cz + 20*[lindex $randlist 2]]
+	set mx [expr $cx + 25*[lindex $randlist 0]]
+	set my [expr $cy + 25*[lindex $randlist 1]]
+	set mz [expr $cz + 25*[lindex $randlist 2]]
 
 	puts "$mx $my $mz"
 	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
@@ -224,26 +229,29 @@ while {$flag == 0} {
 	}
 
 	set zlist {}
-	for {set i 0} {$i < $N} { incr i} {
+	set zmincheck 0
+	for {set i 0} {$i < $N} {incr i} {
 		set z [lindex [part $i print pos] 2]
-		if {$z < [expr $cz + $lj_cutoff]} {
-			puts "Nooooooo"
-			set illegal_mov 1
+		if {$z > $zmincheck} {
+			set zmincheck $z
 		}
 	}
 
-	if {$illegal_mov == 1} {
-		puts "Monomer will be inside pore"
-		set illegal_mov 0
+	if {$zmincheck < [expr $cz + $lj_cutoff] } {
+		puts "Bad overlap with pore"
+		set position_flag 1
+
 		continue
+
 	}
 
-	for {set i 0} {$i < $N} {incr i} {
-		part $i ext_force $force 1 1
-	}
 
 	#puts "I'm back in the first while"
 	while {1} {
+		for {set i 0} {$i < $N} {incr i} {
+			part $i ext_force $force 1 1
+		}
+
 		set z_list {}
 		set r_list {}		
 		if { $n > $nmax } {
