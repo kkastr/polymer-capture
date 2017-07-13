@@ -314,7 +314,7 @@ while {$flag == 0} {
 
 				
 				puts $part_pos_trans "$N"
-	    		puts $part_pos_trans "Position trans starting $t_thread"
+	    		puts $part_pos_trans "Position trans starting $t_last_thread"
 	         
 				for {set l 0} {$l < $N} {incr l} {
 					puts $part_pos_trans "a$l [part $l print pos]"
