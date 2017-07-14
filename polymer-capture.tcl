@@ -55,7 +55,7 @@ set fixed_N [expr $N/2]
 set equil_time [expr 200.0 * $N]
 set tpore 1
 set z_line [expr $cz - $tpore/2]
-set force [expr -2.0]
+set force [expr -5.0]
 set n_attempt 0
 set illegal_mov 0 
 set rpore 1.5
@@ -330,7 +330,7 @@ while {$flag == 0} {
 			puts $t_last_thread
 			set t_trans [expr $t_thread - $t_last_thread]
 		
-			puts $metrc_csv "$N,$t_trans,$rg_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
+			puts $metric_csv "$N,$t_trans,$rg_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
 
 	      	set n_attempt 0
 	      	set rg_flag 0  
