@@ -330,7 +330,7 @@ while {$flag == 0} {
 			puts $t_last_thread
 			set t_trans [expr $t_thread - $t_last_thread]
 		
-			puts $metric_csv "$N,$t_trans,$rg_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
+			puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
 
 	      	set n_attempt 0
 	      	set rg_flag 0  
