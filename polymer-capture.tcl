@@ -55,11 +55,12 @@ set fixed_N [expr $N/2]
 set equil_time [expr 200.0 * $N]
 set tpore 1
 set z_line [expr $cz - $tpore/2]
-set force [expr -1.0]
+set force [expr -2.0]
 set n_attempt 0
 set illegal_mov 0 
 set rpore 1.5
 set cutofftime 1e6
+set cutoffdist 40
 
 
 proc rand_range {min max} { 
@@ -266,10 +267,10 @@ while {$flag == 0} {
 			set y [lindex [part $i print pos] 1]
 			set z [lindex [part $i print pos] 2]
 			set r [expr sqrt(($x-$cx)*($x-$cx) + ($y-$cy)*($y-$cy) + ($z-$cz)*($z-$cz))]
-			#puts $r
+		
 			lappend z_list $z
 			lappend r_list $r
-			#puts "hi, I'm getting particle positions"
+			
 		}
 		set z_min [::tcl::mathfunc::min {*}$z_list]
 		set z_max [::tcl::mathfunc::max {*}$z_list]
@@ -277,15 +278,15 @@ while {$flag == 0} {
 		set r_max [::tcl::mathfunc::max {*}$r_list]
 
 
-		if {$r_min > 30.0} {
-			puts "Dist greater than r = 30 from pore"
+		if {$r_min > $cutoffdist} {
+			puts "Dist greater than r = $cutoffdist from pore"
 			incr fail
 			set position_flag 1
 			break
 		}
 
 		if {$t > $cutofftime} {
-			"cut off time exceeded - stuck event"
+			puts "cut off time exceeded - stuck event"
 			incr stuck
 			set position_flag 1 
 			break
