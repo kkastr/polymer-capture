@@ -52,7 +52,7 @@ inter 1 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 set t_trans 0
 set trans_flag 0
 set fixed_N [expr $N/2]
-set equil_time [expr 200.0 * $N]
+set equil_time [expr $N * $N]
 set tpore 1
 set z_line [expr $cz - $tpore/2]
 set force [expr -5.0]
@@ -60,7 +60,8 @@ set n_attempt 0
 set illegal_mov 0 
 set rpore 1.5
 set cutofftime 1e6
-set cutoffdist 40
+set cutoffdist 30
+set transportdist 20
 
 
 proc rand_range {min max} { 
@@ -194,9 +195,9 @@ while {$flag == 0} {
 	set pz [lindex [part $min_part print pos] 2]
 
 
-	set mx [expr $cx + 25*[lindex $randlist 0]]
-	set my [expr $cy + 25*[lindex $randlist 1]]
-	set mz [expr $cz + 25*[lindex $randlist 2]]
+	set mx [expr $cx + $transportdist*[lindex $randlist 0]]
+	set my [expr $cy + $transportdist*[lindex $randlist 1]]
+	set mz [expr $cz + $transportdist*[lindex $randlist 2]]
 
 	puts "$mx $my $mz"
 	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
