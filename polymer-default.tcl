@@ -92,9 +92,9 @@ if { $vis == 1 } {
 set part_pos_contact [open "data/${filename}_$N/part_pos_contact-$N-$rseed.xyz" "a"]
 set part_pos_trans [open "data/${filename}_$N/part_pos_trans-$N-$rseed.xyz" "a"]
 #set part_pos_z [open "data/${filename}_$N/part_pos_z-$N-$rseed.xyz" "a"]
-set metric_csv [open "data/${filename}_$N/metric-${filename}.csv" "a+"]
+set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
 
-puts $metric_csv "N,tau,rgxtrans,rgytrans,rgztrans,rgxycorrtrans,rgxequil,rgyequil,rgzequil,rgxycorrequil,tfirstthread,tthread,tlastthread"
+#puts $metric_csv "N,tau,rgxtrans,rgytrans,rgztrans,rgxycorrtrans,rgxequil,rgyequil,rgzequil,rgxycorrequil,tfirstthread,tthread,tlastthread"
 
 
 set flag 0
