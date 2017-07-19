@@ -116,8 +116,8 @@ if { $vis == 1 } {
     imd positions
 }
 
-set part_pos_contact [open "data/${filename}_$N/part_pos_contact-$N-$rseed.xyz" "a"]
-set part_pos_trans [open "data/${filename}_$N/part_pos_trans-$N-$rseed.xyz" "a"]
+# set part_pos_contact [open "data/${filename}_$N/part_pos_contact-$N-$rseed.xyz" "a"]
+# set part_pos_trans [open "data/${filename}_$N/part_pos_trans-$N-$rseed.xyz" "a"]
 #set part_pos_z [open "data/${filename}_$N/part_pos_z-$N-$rseed.xyz" "a"]
 #set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
 
@@ -210,9 +210,9 @@ while {$flag == 0} {
 	puts "$mx $my $mz"
 	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
 	set mr [expr sqrt($mr2)]
-	puts $mr
+#	puts $mr
 
-	puts $min_part
+#	puts $min_part
 	part $min_part pos $mx $my $mz type 0
 
 	set tx [lindex [part $min_part print pos] 0]
@@ -303,7 +303,7 @@ while {$flag == 0} {
 
 
 		if {$z_min > $z_line && $trans_flag == 1} {
-			puts "zmin greater than zline"
+#			puts "zmin greater than zline"
 			set trans_flag 0
 		}
 
@@ -323,12 +323,12 @@ while {$flag == 0} {
 				set rg_calc_trans [analyze rg 0 1 $N]
 
 				
-				puts $part_pos_trans "$N"
-	    		puts $part_pos_trans "Position trans starting $t_last_thread"
+				# puts $part_pos_trans "$N"
+	   #  		puts $part_pos_trans "Position trans starting $t_last_thread"
 	         
-				for {set l 0} {$l < $N} {incr l} {
-					puts $part_pos_trans "a$l [part $l print pos]"
-				}
+				# for {set l 0} {$l < $N} {incr l} {
+				# 	puts $part_pos_trans "a$l [part $l print pos]"
+				# }
 				set trans_flag [expr $trans_flag + 1 ]
 			}
 		}
@@ -338,10 +338,10 @@ while {$flag == 0} {
 			set t_thread $t
 			puts $t_last_thread
 			set t_trans [expr $t_thread - $t_last_thread]
-			set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
+			# set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
 			
-			puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
-			close $metric_csv
+			# puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
+			# close $metric_csv
 
 	      	set n_attempt 0
 	      	set rg_flag 0  
@@ -358,7 +358,7 @@ while {$flag == 0} {
 		incr t
 	}
 }
-close $part_pos_contact
-close $part_pos_trans
+# close $part_pos_contact
+# close $part_pos_trans
 #close $part_pos_z
 # close $metric_csv
