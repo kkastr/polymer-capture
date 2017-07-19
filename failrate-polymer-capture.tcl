@@ -1,11 +1,11 @@
 set N [lindex $argv 0]
 set rseed  [lindex $argv 1]
 set filename [lindex $argv 2]
-set cutoffdist [lindex $argv 3]
-set transportdist [lindex $argv 4]
-set vis [lindex $argv 5]
+#set cutoffdist [lindex $argv 3]
+set transportdist [lindex $argv 3]
+set vis [lindex $argv 4]
 
-
+set cutoffdist [expr $transportdist + 10]
 t_random seed $rseed
 
 
