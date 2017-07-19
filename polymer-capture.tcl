@@ -15,9 +15,8 @@ set boxz 500
 set cx [expr $boxx/2.0]
 set cy [expr $boxy/2.0]
 set cz [expr $boxz/2.0]
-set tmax 10000
 set nmax 10
-set temp 1; set gamma 1.0; set gamma_equilibration 0.1
+set temp 1.0; set gamma 1.0; set gamma_equilibration 0.1
 
 
 
@@ -118,7 +117,7 @@ if { $vis == 1 } {
 set part_pos_contact [open "data/${filename}_$N/part_pos_contact-$N-$rseed.xyz" "a"]
 set part_pos_trans [open "data/${filename}_$N/part_pos_trans-$N-$rseed.xyz" "a"]
 #set part_pos_z [open "data/${filename}_$N/part_pos_z-$N-$rseed.xyz" "a"]
-set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
+#set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
 
 #puts $metric_csv "N,tau,rgxtrans,rgytrans,rgztrans,rgxycorrtrans,rgxequil,rgyequil,rgzequil,rgxycorrequil,tfirstthread,tthread,tlastthread"
 
@@ -337,7 +336,9 @@ while {$flag == 0} {
 			set t_thread $t
 			puts $t_last_thread
 			set t_trans [expr $t_thread - $t_last_thread]
-		
+			set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
+			close $metric_csv
+
 			puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
 
 	      	set n_attempt 0
@@ -358,4 +359,4 @@ while {$flag == 0} {
 close $part_pos_contact
 close $part_pos_trans
 #close $part_pos_z
-close $metric_csv
+# close $metric_csv
