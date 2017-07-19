@@ -337,9 +337,9 @@ while {$flag == 0} {
 			puts $t_last_thread
 			set t_trans [expr $t_thread - $t_last_thread]
 			set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
-			close $metric_csv
-
+			
 			puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
+			close $metric_csv
 
 	      	set n_attempt 0
 	      	set rg_flag 0  
