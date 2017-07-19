@@ -5,7 +5,7 @@ set filename [lindex $argv 2]
 set transportdist [lindex $argv 3]
 set vis [lindex $argv 4]
 
-set cutoffdist [expr $transportdist + 10]
+set cutoffdist [expr $transportdist + 20]
 t_random seed $rseed
 
 
@@ -64,9 +64,9 @@ set cutofftime 1e5
 #set cutoffdist 40
 #set transportdist 25
 
-# set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
-# set rgwlc [expr sqrt($rgwlc2)]
-# puts $rgwlc
+set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
+set rgwlc [expr sqrt($rgwlc2)]
+puts $rgwlc
 
 
 proc rand_range {min max} { 
