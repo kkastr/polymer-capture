@@ -31,7 +31,7 @@ set k_fene 30.0
 set r_fene 1.5
 
 #Angular Potential - Harmonic
-set k_angle [expr 10.0 / $temp]
+set k_angle [expr 10.0 *$temp]
 set pi 3.14159
 
 #Shifted Lennard-Jones
@@ -337,7 +337,7 @@ while {$flag == 0} {
 			puts $t_last_thread
 			set t_trans [expr $t_thread - $t_last_thread]
 			set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
-			
+
 			puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
 			close $metric_csv
 
