@@ -60,7 +60,7 @@ set force [expr -1.0]
 set n_attempt 0
 set illegal_mov 0 
 set rpore 1.5
-set cutofftime 1e6
+set cutofftime 1e5
 #set cutoffdist 40
 #set transportdist 25
 
