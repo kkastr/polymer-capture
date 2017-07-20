@@ -59,8 +59,9 @@ set n_attempt 0
 set illegal_mov 0 
 set rpore 1.5
 set cutofftime 1e6
-set cutoffdist 40
-set transportdist 25
+set transportdist 20
+set cutoffdist [expr $transportdist + 20]
+
 
 # set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
 # set rgwlc [expr sqrt($rgwlc2)]
@@ -201,9 +202,9 @@ while {$flag == 0} {
 	set pz [lindex [part $min_part print pos] 2]
 
 
-	set mx [expr $cx + $transportdist*[lindex $randlist 0]]
-	set my [expr $cy + $transportdist*[lindex $randlist 1]]
-	set mz [expr $cz + $transportdist*[lindex $randlist 2]]
+	set mx [expr $cx + $lj_cutoff + $transportdist*[lindex $randlist 0]]
+	set my [expr $cy + $lj_cutoff + $transportdist*[lindex $randlist 1]]
+	set mz [expr $cz + $lj_cutoff + $transportdist*[lindex $randlist 2]]
 
 	puts "$mx $my $mz"
 	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
@@ -293,7 +294,7 @@ while {$flag == 0} {
 		}
 
 		if {$t > $cutofftime} {
-			puts "cut off time exceeded - stuck event"
+			puts "cutoff time exceeded - stuck event"
 			incr stuck
 			set position_flag 1 
 			break
