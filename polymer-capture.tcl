@@ -173,7 +173,7 @@ while {$flag == 0} {
 	set rg_at_equil [analyze rg 0 1 $N]
 	}
 	#puts $drawrand
-	if {$drawrand == 0} {
+	
 	set rlist {}
 
 	for {set j 0} {$j < $N} {incr j} {
@@ -241,8 +241,7 @@ while {$flag == 0} {
 			part $i pos $ix $iy $iz type 0 
 			}
 		}
-	set drawrand 1
-	}
+
 	
 	set zlist {}
 	set zmincheck 32768
@@ -257,19 +256,15 @@ while {$flag == 0} {
 		#puts "Bad overlap with pore"
 		#set position_flag 1
 		incr overlap
-		set drawrand 0
+
 		#puts  "overlap $overlap"
 		continue
 
 	}
-	puts  " overlap $overlap"
-	if {$overlap == 0} {
-		set position_flag 1
-	
-	}
+	puts  "overlap $overlap"
+
 	puts "positionflag $position_flag"
 	
-	set drawrand 0
 
 
 	#puts "I'm back in the first while"
