@@ -57,10 +57,10 @@ set z_line [expr $cz - $tpore/2]
 set force [expr -1.0]
 set n_attempt 0
 set illegal_mov 0 
-set rpore 1.5
+set rpore 1.9
 set cutofftime 1e6
-set transportdist 20
-set cutoffdist [expr $transportdist + 20]
+set transportdist 25
+set cutoffdist [expr $transportdist + 50]
 set contactdist [expr 3]
 
 
