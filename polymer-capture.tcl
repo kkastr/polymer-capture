@@ -271,7 +271,7 @@ while {$flag == 0} {
 
 	while {1} {
 		for {set i 0} {$i < $N} {incr i} {
-			part $i ext_force $force 1 1
+			part $i ext_force $force 1.6 1.6
 		}
 
 		set z_list {}
