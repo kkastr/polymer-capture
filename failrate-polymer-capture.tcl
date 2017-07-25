@@ -1,11 +1,10 @@
 set N [lindex $argv 0]
 set rseed  [lindex $argv 1]
 set filename [lindex $argv 2]
-#set cutoffdist [lindex $argv 3]
 set transportdist [lindex $argv 3]
 set vis [lindex $argv 4]
 
-set cutoffdist [expr $transportdist + 20]
+
 t_random seed $rseed
 
 
@@ -18,7 +17,7 @@ set cx [expr $boxx/2.0]
 set cy [expr $boxy/2.0]
 set cz [expr $boxz/2.0]
 set nmax 10
-set temp 1.0; set gamma 1.0; set gamma_equilibration 0.1
+set temp 1.0; set gamma 1.0; set gamma_equilibration 0.01
 
 
 
@@ -33,7 +32,7 @@ set k_fene 30.0
 set r_fene 1.5
 
 #Angular Potential - Harmonic
-set k_angle [expr 10.0 / $temp]
+set k_angle [expr 10.0 *$temp]
 set pi 3.14159
 
 #Shifted Lennard-Jones
@@ -53,16 +52,18 @@ inter 1 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 set t_trans 0
 set trans_flag 0
 set fixed_N [expr $N/2]
-set equil_time [expr  $N*$N]
+set equil_time [expr 20.0 * $N]
 set tpore 1
 set z_line [expr $cz - $tpore/2]
 set force [expr -1.0]
 set n_attempt 0
 set illegal_mov 0 
 set rpore 1.5
-set cutofftime 1e5
-#set cutoffdist 40
-#set transportdist 25
+set cutofftime 1e6
+#set transportdist 20
+set cutoffdist [expr $transportdist + 20]
+set contactdist [expr 3]
+
 
 # set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
 # set rgwlc [expr sqrt($rgwlc2)]
@@ -93,6 +94,7 @@ proc randgen {} {
 
 
 part [expr $N] pos $cx $cy $cz type 99 fix
+
 constraint pore center [expr $cx] [expr $cy] [expr $cz] axis 0 0 1 radius $rpore length $tpore type 1
 
 for { set i 0 } { $i < $N } { incr i } {
@@ -132,12 +134,15 @@ set fail 0
 set success 0
 set trans_flag 0
 set stuck 0
+set drawrand 0
 
 
 set position_flag 0
+set contactflag 0
+set ncontact 0
 while {$flag == 0} {
 
-
+	set overlap 0
 	if {$position_flag == 1} {
 		for {set i 0} {$i < $N} {incr i} {
 			part $i ext_force 0 0 0
@@ -150,7 +155,7 @@ while {$flag == 0} {
 		part $i pos $x $y $z type 0 
 	}
 	set position_flag 0
-	}
+	
 	part $fixed_N fix
 
 	thermostat langevin $temp $gamma_equilibration
@@ -164,12 +169,12 @@ while {$flag == 0} {
 
 	part $fixed_N unfix
 
-	puts "equilibrated."
+	#puts "equilibrated."
 	
 	set rg_at_equil [analyze rg 0 1 $N]
-
-	
-
+	}
+	#puts $drawrand
+	if {$drawrand == 0} {
 	set rlist {}
 
 	for {set j 0} {$j < $N} {incr j} {
@@ -203,16 +208,16 @@ while {$flag == 0} {
 	set pz [lindex [part $min_part print pos] 2]
 
 
-	set mx [expr $cx + $transportdist*[lindex $randlist 0]]
-	set my [expr $cy + $transportdist*[lindex $randlist 1]]
-	set mz [expr $cz + $transportdist*[lindex $randlist 2]]
+	set mx [expr $cx + $lj_cutoff + $transportdist*[lindex $randlist 0]]
+	set my [expr $cy + $lj_cutoff + $transportdist*[lindex $randlist 1]]
+	set mz [expr $cz + $lj_cutoff + $transportdist*[lindex $randlist 2]]
 
-	puts "$mx $my $mz"
+	#puts "$mx $my $mz"
 	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
 	set mr [expr sqrt($mr2)]
-#	puts $mr
+	#puts $mr
 
-#	puts $min_part
+	#puts $min_part
 	part $min_part pos $mx $my $mz type 0
 
 	set tx [lindex [part $min_part print pos] 0]
@@ -235,9 +240,11 @@ while {$flag == 0} {
 			#puts "$ix $iy $iz"
 			#puts $ir
 			part $i pos $ix $iy $iz type 0 
+			}
 		}
+	set drawrand 1
 	}
-
+	
 	set zlist {}
 	set zmincheck 32768
 	for {set i 0} {$i < $N} {incr i} {
@@ -247,13 +254,24 @@ while {$flag == 0} {
 		}
 	}
 
-	if {$zmincheck < [expr $cz + $lj_cutoff + 1.0] } {
-		puts "Bad overlap with pore"
-		set position_flag 1
-
+	if {$zmincheck < [expr $cz + $lj_cutoff + 0.5 + 0.5] } {
+		#puts "Bad overlap with pore"
+		#set position_flag 1
+		incr overlap
+		set drawrand 0
+		#puts  "overlap $overlap"
 		continue
 
 	}
+	puts  " overlap $overlap"
+	if {$overlap == 0} {
+		set position_flag 1
+	
+	}
+	puts "positionflag $position_flag"
+	
+	set drawrand 0
+
 
 	#puts "I'm back in the first while"
 
@@ -295,60 +313,81 @@ while {$flag == 0} {
 		}
 
 		if {$t > $cutofftime} {
-			puts "cut off time exceeded - stuck event"
+			puts "cutoff time exceeded - stuck event"
 			incr stuck
 			set position_flag 1 
 			break
 		}
 
+		if {$r_min <= $contactdist && $contactflag == 0} {
+			puts "Contact with pore"
+			for {set i 0} {$i < $N} {incr i} {
+				set x [lindex [part $i print pos] 0]
+				set y [lindex [part $i print pos] 1]
+				set z [lindex [part $i print pos] 2]
+				set r [expr sqrt(($x-$cx)*($x-$cx) + ($y-$cy)*($y-$cy) + ($z-$cz)*($z-$cz))]
+				if {$r == $r_min} {
+					set ncontact $i
+				}
+			}
+			set contactflag 1
+		}
 
 		if {$z_min > $z_line && $trans_flag == 1} {
-#			puts "zmin greater than zline"
+			puts "zmin greater than zline"
 			set trans_flag 0
 		}
 
-		if {$z_min < $z_line} {
+		if {$z_min < $z_line && $trans_flag == 0} {
 			
-			if {$trans_flag == 0 } {
-				#puts "inside translocation if"
-				set t_last_thread $t
-				
-				if { $n_attempt == 0 } {
-					puts "n_attempt $n_attempt"
-					set t_first_thread $t
-				
-	        
-					set n_attempt [expr $n_attempt + 1]
-				}
-				set rg_calc_trans [analyze rg 0 1 $N]
-
-				
-				# puts $part_pos_trans "$N"
-	   #  		puts $part_pos_trans "Position trans starting $t_last_thread"
-	         
-				# for {set l 0} {$l < $N} {incr l} {
-				# 	puts $part_pos_trans "a$l [part $l print pos]"
-				# }
-				set trans_flag [expr $trans_flag + 1 ]
+		
+			#puts "inside translocation if"
+			set t_last_thread $t
+			
+			if { $n_attempt == 0 } {
+				puts "n_attempt $n_attempt"
+				set t_first_thread $t
+			
+        
+				set n_attempt [expr $n_attempt + 1]
 			}
-		}
-		#puts $z_max
-		if {$z_max < $z_line} {
-			puts "zmax less than zline"
-			set t_thread $t
-			puts $t_last_thread
-			set t_trans [expr $t_thread - $t_last_thread]
-			# set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
+			set rg_calc_trans [analyze rg 0 1 $N]
+
 			
-			# puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck"
-			# close $metric_csv
+			# puts $part_pos_trans "$N"
+   #  		puts $part_pos_trans "Position trans starting $t_last_thread"
+         
+			# for {set l 0} {$l < $N} {incr l} {
+			# 	puts $part_pos_trans "a$l [part $l print pos]"
+			# }
+			set trans_flag [expr $trans_flag + 1 ]
 
 	      	set n_attempt 0
 	      	set rg_flag 0  
 			set n [expr $n + 1.0]
 			set position_flag 1
+			set contactflag	0
 			break
 		}
+		#puts $z_max
+		# if {$z_max < $z_line} {
+		# 	puts "zmax less than zline"
+		# 	set t_thread $t
+		# 	puts $t_last_thread
+		# 	set t_trans [expr $t_thread - $t_last_thread]
+			
+		# 	# set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
+
+		# 	# puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck,$ncontact"
+		# 	# close $metric_csv
+
+	 #      	set n_attempt 0
+	 #      	set rg_flag 0  
+		# 	set n [expr $n + 1.0]
+		# 	set position_flag 1
+		# 	set contactflag	0
+		# 	break
+		# }
 		if {$t_trans != 0} {
 			set t_trans 0 
 		}
