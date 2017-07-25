@@ -274,7 +274,7 @@ while {$flag == 0} {
 
 
 	#puts "I'm back in the first while"
-
+	set tstart $t
 	while {1} {
 		for {set i 0} {$i < $N} {incr i} {
 			part $i ext_force $force 1 1
@@ -312,7 +312,7 @@ while {$flag == 0} {
 			break
 		}
 
-		if {$t > $cutofftime} {
+		if {[expr $t - $tstart ] > $cutofftime} {
 			puts "cutoff time exceeded - stuck event"
 			incr stuck
 			set position_flag 1 
