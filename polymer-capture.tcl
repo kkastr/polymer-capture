@@ -154,7 +154,7 @@ while {$flag == 0} {
 		part $i pos $x $y $z type 0 
 	}
 	set position_flag 0
-	
+	}
 	part $fixed_N fix
 
 	thermostat langevin $temp $gamma_equilibration
@@ -171,7 +171,7 @@ while {$flag == 0} {
 	#puts "equilibrated."
 	
 	set rg_at_equil [analyze rg 0 1 $N]
-	}
+	
 	#puts $drawrand
 	
 	set rlist {}
