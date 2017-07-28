@@ -1,8 +1,8 @@
 set N [lindex $argv 0]
 set rseed  [lindex $argv 1]
 set filename [lindex $argv 2]
-set transportdist [lindex $argv 3]
-set vis [lindex $argv 4]
+#set transportdist [lindex $argv 3]
+set vis [lindex $argv 3]
 
 
 t_random seed $rseed
@@ -17,7 +17,7 @@ set cx [expr $boxx/2.0]
 set cy [expr $boxy/2.0]
 set cz [expr $boxz/2.0]
 set nmax 10
-set temp 1.0; set gamma 1.0; set gamma_equilibration 0.01
+set temp 0.1; set gamma 1.0; set gamma_equilibration 0.01
 
 
 
@@ -49,6 +49,11 @@ inter 1 angle $k_angle $pi
 inter 0 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 inter 1 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 
+
+set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
+set rgwlc [expr sqrt($rgwlc2)]
+puts $rgwlc
+
 set t_trans 0
 set trans_flag 0
 set fixed_N [expr $N/2]
@@ -60,14 +65,10 @@ set n_attempt 0
 set illegal_mov 0 
 set rpore 1.9
 set cutofftime 1e6
-#set transportdist 20
+set transportdist [expr 2.5*$rgwlc]
 set cutoffdist [expr $transportdist + 40]
 set contactdist [expr 3]
 
-
-# set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
-# set rgwlc [expr sqrt($rgwlc2)]
-# puts $rgwlc
 
 
 proc rand_range {min max} { 
@@ -271,6 +272,20 @@ while {$flag == 0} {
 
 	#puts "I'm back in the first while"
 	set tstart $t
+	set rg_crossings 0
+	set 10crossings 0
+	set 15crossings 0
+	set 20crossings 0
+	set 25crossings 0
+	set 30crossings 0
+	set 35crossings 0
+	set 40crossings 0
+	set 45crossings 0
+	set 50crossings 0
+	set 55crossings 0
+	set 60crossings 0
+	
+
 	while {1} {
 		for {set i 0} {$i < $N} {incr i} {
 			part $i ext_force $force 1.6 1.6
@@ -284,7 +299,7 @@ while {$flag == 0} {
 			puts "$fail $success"
 			break
 		}
-
+		set rmincheck 32768
 		for {set i 0} { $i < $N } {incr i} {
 			set x [lindex [part $i print pos] 0]
 			set y [lindex [part $i print pos] 1]
@@ -292,13 +307,77 @@ while {$flag == 0} {
 			set r [expr sqrt(($x-$cx)*($x-$cx) + ($y-$cy)*($y-$cy) + ($z-$cz)*($z-$cz))]
 		
 			lappend z_list $z
-			lappend r_list $r
-			
+			lappend r_list $r			
 		}
+		
+		
+
 		set z_min [::tcl::mathfunc::min {*}$z_list]
 		set z_max [::tcl::mathfunc::max {*}$z_list]
 		set r_min [::tcl::mathfunc::min {*}$r_list]
 		set r_max [::tcl::mathfunc::max {*}$r_list]
+
+		set iminx [lindex [part $min_part print pos] 0]
+		set iminy [lindex [part $min_part print pos] 1]
+		set iminz [lindex [part $min_part print pos] 2]
+		set iminr [expr sqrt(pow([expr $iminx - $cx],2) + pow([expr $iminz - $cz],2) + pow([expr $iminz - $cz],2) )]
+
+		set tol {}
+		#60 is pretty arbirtrary, roughly 2 * Rg for wlc with N = 200
+		for {set j 0} {$j < 60} {incr j} {
+			if {[expr $j%5] == 0.0} {
+				lappend tol [expr abs($j - $iminr)]
+			}
+		}
+
+		set tolrg [expr abs(2.0*$rgwlc - $iminr)]
+
+		if {$tolrg >= 0.0 && $tolrg < 0.001} {
+			set rg_crossings [expr $rg_crossings + 1]
+		}	
+
+		if {[lindex $tol 0] >= 0.0 && [lindex $tol 0] < 0.01} {
+			incr 10crossings
+		}
+
+		if {[lindex $tol 1] >= 0.0 && [lindex $tol 1] < 0.01} {
+			incr 15crossings
+		}
+
+		if {[lindex $tol 2] >= 0.0 && [lindex $tol 2] < 0.01} {
+			incr 20crossings
+		}
+		if {[lindex $tol 3] >= 0.0 && [lindex $tol 3] < 0.01} {
+			incr 25crossings
+		}
+		if {[lindex $tol 4] >= 0.0 && [lindex $tol 4] < 0.01} {
+			incr 30crossings
+		}
+		if {[lindex $tol 5] >= 0.0 && [lindex $tol 5] < 0.01} {
+			incr 35crossings
+		}
+		if {[lindex $tol 6] >= 0.0 && [lindex $tol 6] < 0.01} {
+			incr 40crossings
+		}
+		if {[lindex $tol 7] >= 0.0 && [lindex $tol 7] < 0.01} {
+			incr 45crossings
+		}
+		if {[lindex $tol 8] >= 0.0 && [lindex $tol 8] < 0.01} {
+			incr 50crossings
+		}
+		if {[lindex $tol 9] >= 0.0 && [lindex $tol 9] < 0.01} {
+			incr 55crossings
+		}
+		if {[lindex $tol 10] >= 0.0 && [lindex $tol 10] < 0.01} {
+			incr 60crossings
+		}
+
+		set crossings_csv [open "data/${filename}_$N/crossings-${filename}-$N-$rseed.csv" "a"]
+		puts $crossings_csv "$rg_crossings,$10crossings,$15crossings,$20crossings,$25crossings,$30crossings,$35crossings,$40crossings,$45crossings,$50crossings,$55crossings,$60crossings"
+		close $crossings_csv
+
+
+
 
 
 		if {$r_min > $cutoffdist} {
