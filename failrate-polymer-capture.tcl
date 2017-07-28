@@ -50,9 +50,9 @@ inter 0 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 inter 1 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 
 
-set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
-set rgwlc [expr sqrt($rgwlc2)]
-puts $rgwlc
+# set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
+# set rgwlc [expr sqrt($rgwlc2)]
+# puts $rgwlc
 
 set t_trans 0
 set trans_flag 0
@@ -65,7 +65,7 @@ set n_attempt 0
 set illegal_mov 0 
 set rpore 1.9
 set cutofftime 1e6
-set transportdist [expr 2.5*$rgwlc]
+set transportdist [expr 40]
 set cutoffdist [expr $transportdist + 40]
 set contactdist [expr 3]
 
