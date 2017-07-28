@@ -330,12 +330,6 @@ while {$flag == 0} {
 			}
 		}
 
-		set tolrg [expr abs(2.0*$rgwlc - $iminr)]
-
-		if {$tolrg >= 0.0 && $tolrg < 0.001} {
-			set rg_crossings [expr $rg_crossings + 1]
-		}	
-
 		if {[lindex $tol 0] >= 0.0 && [lindex $tol 0] < 0.01} {
 			incr 10crossings
 		}
@@ -373,7 +367,7 @@ while {$flag == 0} {
 		}
 
 		set crossings_csv [open "data/${filename}_$N/crossings-${filename}-$N-$rseed.csv" "a"]
-		puts $crossings_csv "$rg_crossings,$10crossings,$15crossings,$20crossings,$25crossings,$30crossings,$35crossings,$40crossings,$45crossings,$50crossings,$55crossings,$60crossings"
+		puts $crossings_csv "$10crossings,$15crossings,$20crossings,$25crossings,$30crossings,$35crossings,$40crossings,$45crossings,$50crossings,$55crossings,$60crossings"
 		close $crossings_csv
 
 
