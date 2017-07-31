@@ -308,7 +308,7 @@ while {$flag == 0} {
 			set r [expr sqrt(($x-$cx)*($x-$cx) + ($y-$cy)*($y-$cy) + ($z-$cz)*($z-$cz))]
 			if {$r < $rmincheck} {
 				set imin $i
-				puts "$imin"
+				#puts "$imin"
 				set rmincheck $r
 			}
 			lappend z_list $z
