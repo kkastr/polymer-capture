@@ -255,7 +255,7 @@ while {$flag == 0} {
 	}
 
 	if {$zmincheck < [expr $cz + $lj_cutoff + 0.5 + 0.5] } {
-		#puts "Bad overlap with pore"
+		puts "Bad overlap with pore"
 		#set position_flag 1
 		incr overlap
 	
@@ -263,7 +263,7 @@ while {$flag == 0} {
 		continue
 
 	}
-	puts  "overlap $overlap"
+	puts "overlap $overlap"
 
 	puts "positionflag $position_flag"
 	
