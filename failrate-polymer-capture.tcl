@@ -65,7 +65,7 @@ set n_attempt 0
 set illegal_mov 0 
 set rpore 1.9
 set cutofftime 1e6
-set transportdist [expr 50]
+set transportdist [expr 40]
 set cutoffdist [expr $transportdist + 40]
 set contactdist [expr 3]
 
