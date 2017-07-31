@@ -271,7 +271,7 @@ while {$flag == 0} {
 
 	#puts "I'm back in the first while"
 	set tstart $t
-	set rg_crossings 0
+	
 	set 10crossings 0
 	set 15crossings 0
 	set 20crossings 0
@@ -286,6 +286,7 @@ while {$flag == 0} {
 	
 
 	while {1} {
+
 		for {set i 0} {$i < $N} {incr i} {
 			part $i ext_force $force 1.9 1.9
 		}
@@ -299,12 +300,17 @@ while {$flag == 0} {
 			break
 		}
 		set rmincheck 32768
+		set imin 0
 		for {set i 0} { $i < $N } {incr i} {
 			set x [lindex [part $i print pos] 0]
 			set y [lindex [part $i print pos] 1]
 			set z [lindex [part $i print pos] 2]
 			set r [expr sqrt(($x-$cx)*($x-$cx) + ($y-$cy)*($y-$cy) + ($z-$cz)*($z-$cz))]
-		
+			if {$r < $rmincheck} {
+				set imin $i
+				puts "$imin"
+				set rmincheck $r
+			}
 			lappend z_list $z
 			lappend r_list $r			
 		}
@@ -316,9 +322,9 @@ while {$flag == 0} {
 		set r_min [::tcl::mathfunc::min {*}$r_list]
 		set r_max [::tcl::mathfunc::max {*}$r_list]
 
-		set iminx [lindex [part $min_part print pos] 0]
-		set iminy [lindex [part $min_part print pos] 1]
-		set iminz [lindex [part $min_part print pos] 2]
+		set iminx [lindex [part $imin print pos] 0]
+		set iminy [lindex [part $imin print pos] 1]
+		set iminz [lindex [part $imin print pos] 2]
 		set iminr [expr sqrt(pow([expr $iminx - $cx],2) + pow([expr $iminz - $cz],2) + pow([expr $iminz - $cz],2) )]
 
 		set tol {}
