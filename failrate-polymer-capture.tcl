@@ -316,7 +316,7 @@ while {$flag == 0} {
 		}
 		
 		
-
+		
 		set z_min [::tcl::mathfunc::min {*}$z_list]
 		set z_max [::tcl::mathfunc::max {*}$z_list]
 		set r_min [::tcl::mathfunc::min {*}$r_list]
