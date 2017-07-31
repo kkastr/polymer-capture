@@ -65,7 +65,7 @@ set n_attempt 0
 set illegal_mov 0 
 set rpore 1.9
 set cutofftime 1e6
-set transportdist [expr 40]
+set transportdist [expr 50]
 set cutoffdist [expr $transportdist + 40]
 set contactdist [expr 3]
 
@@ -288,7 +288,7 @@ while {$flag == 0} {
 
 	while {1} {
 		for {set i 0} {$i < $N} {incr i} {
-			part $i ext_force $force 1.6 1.6
+			part $i ext_force $force 1.9 1.9
 		}
 
 		set z_list {}
@@ -330,45 +330,45 @@ while {$flag == 0} {
 			}
 		}
 
-		if {[lindex $tol 0] >= 0.0 && [lindex $tol 0] < 0.01} {
+		if {[lindex $tol 0] >= 0.0 && [lindex $tol 0] < 0.1} {
 			incr 10crossings
 		}
 
-		if {[lindex $tol 1] >= 0.0 && [lindex $tol 1] < 0.01} {
+		if {[lindex $tol 1] >= 0.0 && [lindex $tol 1] < 0.1} {
 			incr 15crossings
 		}
 
-		if {[lindex $tol 2] >= 0.0 && [lindex $tol 2] < 0.01} {
+		if {[lindex $tol 2] >= 0.0 && [lindex $tol 2] < 0.1} {
 			incr 20crossings
 		}
-		if {[lindex $tol 3] >= 0.0 && [lindex $tol 3] < 0.01} {
+		if {[lindex $tol 3] >= 0.0 && [lindex $tol 3] < 0.1} {
 			incr 25crossings
 		}
-		if {[lindex $tol 4] >= 0.0 && [lindex $tol 4] < 0.01} {
+		if {[lindex $tol 4] >= 0.0 && [lindex $tol 4] < 0.1} {
 			incr 30crossings
 		}
-		if {[lindex $tol 5] >= 0.0 && [lindex $tol 5] < 0.01} {
+		if {[lindex $tol 5] >= 0.0 && [lindex $tol 5] < 0.1} {
 			incr 35crossings
 		}
-		if {[lindex $tol 6] >= 0.0 && [lindex $tol 6] < 0.01} {
+		if {[lindex $tol 6] >= 0.0 && [lindex $tol 6] < 0.1} {
 			incr 40crossings
 		}
-		if {[lindex $tol 7] >= 0.0 && [lindex $tol 7] < 0.01} {
+		if {[lindex $tol 7] >= 0.0 && [lindex $tol 7] < 0.1} {
 			incr 45crossings
 		}
-		if {[lindex $tol 8] >= 0.0 && [lindex $tol 8] < 0.01} {
+		if {[lindex $tol 8] >= 0.0 && [lindex $tol 8] < 0.1} {
 			incr 50crossings
 		}
-		if {[lindex $tol 9] >= 0.0 && [lindex $tol 9] < 0.01} {
+		if {[lindex $tol 9] >= 0.0 && [lindex $tol 9] < 0.1} {
 			incr 55crossings
 		}
-		if {[lindex $tol 10] >= 0.0 && [lindex $tol 10] < 0.01} {
+		if {[lindex $tol 10] >= 0.0 && [lindex $tol 10] < 0.1} {
 			incr 60crossings
 		}
 
-		set crossings_csv [open "data/${filename}_$N/crossings-${filename}-$N-$rseed.csv" "a"]
-		puts $crossings_csv "$10crossings,$15crossings,$20crossings,$25crossings,$30crossings,$35crossings,$40crossings,$45crossings,$50crossings,$55crossings,$60crossings"
-		close $crossings_csv
+		# set crossings_csv [open "data/${filename}_$N/crossings-${filename}-$N-$rseed.csv" "a"]
+		# puts $crossings_csv "$10crossings,$15crossings,$20crossings,$25crossings,$30crossings,$35crossings,$40crossings,$45crossings,$50crossings,$55crossings,$60crossings"
+		# close $crossings_csv
 
 
 
@@ -418,6 +418,9 @@ while {$flag == 0} {
 				set t_first_thread $t
 			
         
+
+
+
 				set n_attempt [expr $n_attempt + 1]
 			}
 			set rg_calc_trans [analyze rg 0 1 $N]
@@ -436,6 +439,9 @@ while {$flag == 0} {
 			set n [expr $n + 1.0]
 			set position_flag 1
 			set contactflag	0
+			set crossings_csv [open "data/${filename}_$N/crossings-${filename}-$N-$rseed.csv" "a"]
+			puts $crossings_csv "$10crossings,$15crossings,$20crossings,$25crossings,$30crossings,$35crossings,$40crossings,$45crossings,$50crossings,$55crossings,$60crossings"
+			close $crossings_csv
 			break
 		}
 		#puts $z_max
