@@ -272,18 +272,7 @@ while {$flag == 0} {
 	#puts "I'm back in the first while"
 	set tstart $t
 	
-	set 10crossings 0
-	set 15crossings 0
-	set 20crossings 0
-	set 25crossings 0
-	set 30crossings 0
-	set 35crossings 0
-	set 40crossings 0
-	set 45crossings 0
-	set 50crossings 0
-	set 55crossings 0
-	set 60crossings 0
-	
+
 
 	while {1} {
 
@@ -325,7 +314,7 @@ while {$flag == 0} {
 		set iminx [lindex [part $imin print pos] 0]
 		set iminy [lindex [part $imin print pos] 1]
 		set iminz [lindex [part $imin print pos] 2]
-		set iminr [expr sqrt(pow([expr $iminx - $cx],2) + pow([expr $iminz - $cz],2) + pow([expr $iminz - $cz],2) )]
+		set iminr [expr sqrt(pow([expr $iminx - $cx],2) + pow([expr $iminy - $cy],2) + pow([expr $iminz - $cz],2))]
 
 
 		set positions_csv [open "data/${filename}_$N/crossings-${filename}-$N-$rseed.csv" "a"]
