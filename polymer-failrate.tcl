@@ -63,7 +63,7 @@ set z_line [expr $cz - $tpore/2]
 set force [expr -3.0]
 set n_attempt 0
 set illegal_mov 0 
-set rpore 1.9
+set rpore 2.1
 set cutofftime 1e6
 set transportdist [expr 40]
 set cutoffdist [expr $transportdist + 40]
@@ -95,7 +95,6 @@ proc randgen {} {
 
 
 part [expr $N] pos $cx $cy $cz type 99 fix
-
 constraint pore center [expr $cx] [expr $cy] [expr $cz] axis 0 0 1 radius $rpore length $tpore type 1
 
 for { set i 0 } { $i < $N } { incr i } {
@@ -277,7 +276,7 @@ while {$flag == 0} {
 	while {1} {
 
 		for {set i 0} {$i < $N} {incr i} {
-			part $i ext_force $force 1.9 1.9
+			part $i ext_force $force 1.6 1.6
 		}
 
 		set z_list {}
@@ -318,7 +317,7 @@ while {$flag == 0} {
 
 
 		set positions_csv [open "data/${filename}_$N/crossings-${filename}-$N-$rseed.csv" "a"]
-		puts $positions_csv "$imin,$iminr,$iminx,$iminy,$iminz"
+		puts $positions_csv "$imin,$r_min,$iminx,$iminy,$iminz"
 		close $positions_csv
 
 		if {$r_min > $cutoffdist} {
@@ -364,22 +363,23 @@ while {$flag == 0} {
 				puts "n_attempt $n_attempt"
 				set t_first_thread $t
 			
-        
-
-
-
-				set n_attempt [expr $n_attempt + 1]
+  				set n_attempt [expr $n_attempt + 1]
 			}
 			set rg_calc_trans [analyze rg 0 1 $N]
 
-			
-			# puts $part_pos_trans "$N"
-   #  		puts $part_pos_trans "Position trans starting $t_last_thread"
-         
-			# for {set l 0} {$l < $N} {incr l} {
-			# 	puts $part_pos_trans "a$l [part $l print pos]"
-			# }
 			set trans_flag [expr $trans_flag + 1 ]
+		}
+		#puts $z_max
+		if {$z_max < $z_line} {
+			puts "zmax less than zline"
+			set t_thread $t
+			puts $t_last_thread
+			set t_trans [expr $t_thread - $t_last_thread]
+			
+			set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
+
+			puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck,$ncontact"
+			close $metric_csv
 
 	      	set n_attempt 0
 	      	set rg_flag 0  
@@ -388,25 +388,6 @@ while {$flag == 0} {
 			set contactflag	0
 			break
 		}
-		#puts $z_max
-		# if {$z_max < $z_line} {
-		# 	puts "zmax less than zline"
-		# 	set t_thread $t
-		# 	puts $t_last_thread
-		# 	set t_trans [expr $t_thread - $t_last_thread]
-			
-		# 	# set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
-
-		# 	# puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck,$ncontact"
-		# 	# close $metric_csv
-
-	 #      	set n_attempt 0
-	 #      	set rg_flag 0  
-		# 	set n [expr $n + 1.0]
-		# 	set position_flag 1
-		# 	set contactflag	0
-		# 	break
-		# }
 		if {$t_trans != 0} {
 			set t_trans 0 
 		}
