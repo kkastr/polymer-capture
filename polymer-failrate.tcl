@@ -147,7 +147,6 @@ while {$flag == 0} {
 		for {set i 0} {$i < $N} {incr i} {
 			part $i ext_force 0 0 0
 		}
-
 	for { set i 0 } { $i < $N } { incr i } {
 		set x [expr $cx - $N/2 + $i]
 		set y [expr $cy]
@@ -163,8 +162,8 @@ while {$flag == 0} {
 	    
 	    integrate 100
 	    imd positions
-	
 	}
+
 	thermostat langevin $temp $gamma
 
 	part $fixed_N unfix
