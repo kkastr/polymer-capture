@@ -65,8 +65,8 @@ set n_attempt 0
 set illegal_mov 0 
 set rpore 2.1
 set cutofftime 1e6
-set transportdist [expr 40]
-set cutoffdist [expr $transportdist + 40]
+set transportdist [expr 60]
+set cutoffdist [expr $transportdist + 60]
 set contactdist [expr 3]
 
 
@@ -315,7 +315,7 @@ while {$flag == 0} {
 		set iminr [expr sqrt(pow([expr $iminx - $cx],2) + pow([expr $iminy - $cy],2) + pow([expr $iminz - $cz],2))]
 
 
-		set positions_csv [open "data/${filename}_$N/crossings-${filename}-$N-$rseed.csv" "a"]
+		set positions_csv [open "data/${filename}_$N/traj-${filename}-$N-$rseed.csv" "a"]
 		puts $positions_csv "$imin,$r_min,$iminx,$iminy,$iminz"
 		close $positions_csv
 
