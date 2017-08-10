@@ -32,7 +32,7 @@ set k_fene 30.0
 set r_fene 1.5
 
 #Angular Potential - Harmonic
-set k_angle [expr 10.0 *$temp]
+set k_angle [expr 10.0 ]
 set pi 3.14159
 
 #Shifted Lennard-Jones
