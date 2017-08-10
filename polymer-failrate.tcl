@@ -57,7 +57,7 @@ inter 1 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 set t_trans 0
 set trans_flag 0
 set fixed_N [expr $N/2]
-set equil_time [expr 20.0 * $N]
+set equil_time [expr 50.0 * $N]
 set tpore 1
 set z_line [expr $cz - $tpore/2]
 set force [expr -3.0]
@@ -65,8 +65,8 @@ set n_attempt 0
 set illegal_mov 0 
 set rpore 2.1
 set cutofftime 1e6
-set transportdist [expr 60]
-set cutoffdist [expr $transportdist + 60]
+set transportdist [expr 80]
+set cutoffdist [expr $transportdist + 80]
 set contactdist [expr 3]
 
 
@@ -123,7 +123,6 @@ if { $vis == 1 } {
 #set part_pos_z [open "data/${filename}_$N/part_pos_z-$N-$rseed.xyz" "a"]
 #set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
 
-#puts $metric_csv "N,tau,rgxtrans,rgytrans,rgztrans,rgxycorrtrans,rgxequil,rgyequil,rgzequil,rgxycorrequil,tfirstthread,tthread,tlastthread"
 
 
 set flag 0
@@ -140,6 +139,10 @@ set drawrand 0
 set position_flag 0
 set contactflag 0
 set ncontact 0
+set st 0
+
+
+set positions_csv [open "data/${filename}_$N/traj-${filename}-$N-$rseed.csv" "a"]
 while {$flag == 0} {
 
 	set overlap 0
@@ -315,9 +318,9 @@ while {$flag == 0} {
 		set iminr [expr sqrt(pow([expr $iminx - $cx],2) + pow([expr $iminy - $cy],2) + pow([expr $iminz - $cz],2))]
 
 
-		set positions_csv [open "data/${filename}_$N/traj-${filename}-$N-$rseed.csv" "a"]
-		puts $positions_csv "$imin,$r_min,$iminx,$iminy,$iminz"
-		close $positions_csv
+		if {$t%10 == 0} { 	
+			puts $positions_csv "$imin,$r_min,$iminx,$iminy,$iminz"
+		}
 
 		if {$r_min > $cutoffdist} {
 			puts "Dist greater than r = $cutoffdist from pore"
@@ -366,6 +369,17 @@ while {$flag == 0} {
 			}
 			set rg_calc_trans [analyze rg 0 1 $N]
 
+			for {set i 0} {$i < $N} {incr i} {
+				set x [lindex [part $i print pos] 0]
+				set y [lindex [part $i print pos] 1]
+				set z [lindex [part $i print pos] 2]
+				set r [expr sqrt(($x-$cx)*($x-$cx) + ($y-$cy)*($y-$cy) + ($z-$cz)*($z-$cz))]
+				if {$z < $z_line} {
+					set st $i
+				}
+			}
+
+
 			set trans_flag [expr $trans_flag + 1 ]
 		}
 		#puts $z_max
@@ -377,7 +391,7 @@ while {$flag == 0} {
 			
 			set metric_csv [open "data/${filename}_$N/metric-${filename}-$N-$rseed.csv" "a"]
 
-			puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck,$ncontact"
+			puts $metric_csv "$N,$t_trans,$rg_calc_trans,$rg_at_equil,$t_first_thread,$t_thread,$t_last_thread,$fail,$stuck,$ncontact,$st"
 			close $metric_csv
 
 	      	set n_attempt 0
@@ -400,3 +414,4 @@ while {$flag == 0} {
 # close $part_pos_trans
 #close $part_pos_z
 # close $metric_csv
+close $positions_csv
