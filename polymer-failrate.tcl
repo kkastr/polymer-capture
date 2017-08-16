@@ -60,10 +60,10 @@ set fixed_N [expr $N/2]
 set equil_time [expr 50.0 * $N]
 set tpore 0.5
 set z_line [expr $cz - $tpore/2]
-set force [expr -3.0]
+set force [expr -5.0]
 set n_attempt 0
 set illegal_mov 0 
-set rpore 2.1
+set rpore 1.3
 set cutofftime 1e6
 set transportdist [expr 80]
 set cutoffdist [expr $transportdist + 80]
@@ -278,7 +278,7 @@ while {$flag == 0} {
 	while {1} {
 
 		for {set i 0} {$i < $N} {incr i} {
-			part $i ext_force $force 1.6 1.6
+			part $i ext_force $force 0.8 0.8
 		}
 
 		set z_list {}
