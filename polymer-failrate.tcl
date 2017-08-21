@@ -63,7 +63,7 @@ set z_line [expr $cz - $tpore/2]
 set force [expr -3.0]
 set n_attempt 0
 set illegal_mov 0 
-set rpore 1.3
+set rpore 2.1
 set cutofftime 1e6
 set transportdist [expr 80]
 set cutoffdist [expr $transportdist + 80]
