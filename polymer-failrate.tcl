@@ -43,7 +43,6 @@ set lj_shift 0.25
 set lj_offset 0 
 
 
-
 inter 0 fene $k_fene $r_fene
 inter 1 angle $k_angle $pi
 inter 0 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
@@ -69,7 +68,7 @@ set transportdist [expr 60]
 set cutoffdist [expr $transportdist + 60]
 set contactdist [expr 3]
 
-
+puts "$transportdist, $rpore, $force"
 
 proc rand_range {min max} { 
 	return [expr rand() * ($max - $min) + $min] 
