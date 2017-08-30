@@ -62,7 +62,8 @@ set z_line [expr $cz - $tpore/2]
 set force [expr -3.0]
 set n_attempt 0
 set illegal_mov 0 
-set rpore 2.1
+set rpore 1.8
+set reff [expr $rpore - 0.5]
 set cutofftime 1e6
 set transportdist [expr 60]
 set cutoffdist [expr $transportdist + 60]
@@ -277,7 +278,7 @@ while {$flag == 0} {
 	while {1} {
 
 		for {set i 0} {$i < $N} {incr i} {
-			part $i ext_force $force 0.8 0.8
+			part $i ext_force $force $reff $reff
 		}
 
 		set z_list {}
