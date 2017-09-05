@@ -2,7 +2,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
+#include <string.h>
 
 int main() {
 
@@ -80,9 +80,9 @@ while (true) {
 	} 
 
 	printf("Finding imax... \n");
-	printf("%d\n",i);
+	printf("First imax: %d\n",i);
 	float k = array[i];
-	printf("%f\n",k);
+	printf("Value at imax: %f\n",k);
 
 	//array slicing format that maps to y = x[n:m]
 	//memcpy(y, x + n, (m - n) * sizeof(*y))
@@ -94,10 +94,12 @@ while (true) {
 
 		zerosfinder = (floor(array[g]) <= 1);
 		if ((zerosfinder)==false) {
-			printf("%d\n",g);
+			printf("Index where the zeroes stop: %d\n",g);
 			break;
 		}
 	}
+
+	g +=1;
 
 	float *tmp;
 
@@ -110,11 +112,10 @@ while (true) {
 
 
 	int v = 0;
-	int n = 10;
-	while (v < lines  && m != (double)floor( (double) array[v])) {
+	int n = 5;
+	while (v < lines  && n != (double)ceil( (double) array[v])) {
 		v++;
 	} 
-
 
 	float *slc;
 
@@ -122,7 +123,15 @@ while (true) {
 
 	memcpy(slc,array+v,(g-v) * sizeof(*array));
 
-	printf("%f\n", slc[0]);
+	printf("Slice array test %f\n", slc[0]);
+	
+
+	int u = 0;
+	while (u < lines  && 10 != (double)floor( (double) slc[u])) {
+		u++;
+	} 
+	printf("back above n at index: %d \n",u);
+
 	break;
 }
 
@@ -138,3 +147,4 @@ while (true) {
 
 return 0;
 }
+
