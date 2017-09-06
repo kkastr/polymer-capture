@@ -49,8 +49,8 @@ inter 0 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 inter 1 0 lennard-jones $eps $sigma $lj_cutoff $lj_shift $lj_offset
 
 
-# set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
-# set rgwlc [expr sqrt($rgwlc2)]
+set rgwlc2 [expr (1.0/3.0) * $k_angle * $N - pow($k_angle,2) + 2.0 * (pow($k_angle,3)/$N) * (1 - ($k_angle/$N)*(1- exp(-$N/$k_angle)) )  ]
+set rgwlc [expr sqrt($rgwlc2)]
 # puts $rgwlc
 
 set t_trans 0
@@ -318,9 +318,42 @@ while {$flag == 0} {
 		set iminr [expr sqrt(pow([expr $iminx - $cx],2) + pow([expr $iminy - $cy],2) + pow([expr $iminz - $cz],2))]
 
 
-		if {$t%10 == 0} { 	
-			puts $positions_csv "$imin,$r_min,$iminx,$iminy,$iminz"
+
+
+		set x_2 0
+		set y_2 0
+		set z_2 0
+		set xs 0
+		set ys 0
+		set zs 0
+
+		for { set i 0 } { $i < $N } { incr i } {
+			set x [lindex [part $i print pos] 0]
+			set y [lindex [part $i print pos] 1]
+			set z [lindex [part $i print pos] 2]
+			puts $ftrj "a$i $x $y $z"
+			set x_2 [expr $x_2 + pow($x,2)] 
+			set y_2 [expr $y_2 + pow($y,2)]
+			set z_2 [expr $z_2 + pow($z,2)]
+			set xs [expr $xs + $x] 
+			set ys [expr $ys + $y]
+			set zs [expr $zs + $z]
 		}
+		
+		
+		if {$t%10 == 0} {
+			set xcom [expr $xs/$N]
+			set ycom [expr $zs/$N]
+			set zcom [expr $ys/$N]
+			
+			set rg_per_tu [analyze rg 0 1 $N]
+			puts $positions_csv "$xcom $ycom $zcom $rg_per_tu"
+		}
+
+
+		# if {$t%10 == 0} { 	
+		# 	puts $positions_csv "$imin,$r_min,$iminx,$iminy,$iminz"
+		# }
 
 		if {$r_min > $cutoffdist} {
 			puts "Dist greater than r = $cutoffdist from pore"
@@ -329,12 +362,18 @@ while {$flag == 0} {
 			break
 		}
 
+		if {$r_min > [expr 0.5 * $rgwlc] } {
+			set tstart $t
+		}
+
 		if {[expr $t - $tstart ] > $cutofftime} {
 			puts "cutoff time exceeded - stuck event"
 			incr stuck
 			set position_flag 1 
 			break
 		}
+
+
 
 		if {$r_min <= $contactdist && $contactflag == 0} {
 			puts "Contact with pore"
