@@ -17,7 +17,7 @@ set cx [expr $boxx/2.0]
 set cy [expr $boxy/2.0]
 set cz [expr $boxz/2.0]
 set nmax 10
-set temp 0.1; set gamma 1.0; set gamma_equilibration 0.01
+set temp 1; set gamma 1.0; set gamma_equilibration 0.01
 
 
 
