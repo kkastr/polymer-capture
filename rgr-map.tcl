@@ -142,7 +142,7 @@ set ncontact 0
 set st 0
 
 set translation_part [expr int($N*0.5)]
-#set positions_csv [open "data/${filename}_$N/traj-${filename}-$N-$rseed.csv" "a"]
+set rgr_csv [open "data/${filename}_$N/rgr-${filename}-$N-$rseed-$transportdist.csv" "a"]
 while {$flag == 0} {
 
 	set overlap 0
@@ -255,8 +255,8 @@ while {$flag == 0} {
 
 	set rg_at_equil [analyze rg 0 1 $N]
 
-
-	puts $rg_at_equil
+	puts $rgr_csv "$rg_at_equil"
+	#puts $rg_at_equil
 	#puts "I'm back in the first while"
 	set tstart $t
 
@@ -269,4 +269,4 @@ while {$flag == 0} {
 # close $part_pos_trans
 #close $part_pos_z
 # close $metric_csv
-#close $positions_csv
+close $rgr_csv
