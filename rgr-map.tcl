@@ -100,7 +100,7 @@ constraint pore center [expr $cx] [expr $cy] [expr $cz] axis 0 0 1 radius $rpore
 for { set i 0 } { $i < $N } { incr i } {
 	set x [expr $cx - $N/2 + $i]
 	set y [expr $cy]
-	set z [expr $cz  + 100]
+	set z [expr $cz  + $transportdist]
 	part $i pos $x $y $z type 0 
 
 
@@ -153,7 +153,7 @@ while {$flag == 0} {
 	for { set i 0 } { $i < $N } { incr i } {
 		set x [expr $cx - $N/2 + $i]
 		set y [expr $cy]
-		set z [expr $cz  + 100]
+		set z [expr $cz  + $transportdist]
 		part $i pos $x $y $z type 0 
 		}
 	set position_flag 0
@@ -166,61 +166,61 @@ while {$flag == 0} {
 	
 	# #puts $drawrand
 
-	set rlist {}
+	# set rlist {}
 
-	set randlist [randgen]
-
-
-	set px [lindex [part $translation_part print pos] 0]
-	set py [lindex [part $translation_part print pos] 1]
-	set pz [lindex [part $translation_part print pos] 2]
+	# set randlist [randgen]
 
 
-	set mx [expr $cx + $lj_cutoff + $transportdist*[lindex $randlist 0]]
-	set my [expr $cy + $lj_cutoff + $transportdist*[lindex $randlist 1]]
-	set mz [expr $cz + $lj_cutoff + $transportdist*[lindex $randlist 2]]
+	# set px [lindex [part $translation_part print pos] 0]
+	# set py [lindex [part $translation_part print pos] 1]
+	# set pz [lindex [part $translation_part print pos] 2]
 
-	#puts "$mx $my $mz"
-	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
-	set mr [expr sqrt($mr2)]
-	#puts $mr
+
+	# set mx [expr $cx + $lj_cutoff + $transportdist*[lindex $randlist 0]]
+	# set my [expr $cy + $lj_cutoff + $transportdist*[lindex $randlist 1]]
+	# set mz [expr $cz + $lj_cutoff + $transportdist*[lindex $randlist 2]]
+
+	# #puts "$mx $my $mz"
+	# set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
+	# set mr [expr sqrt($mr2)]
+	# #puts $mr
 	
-	#puts $min_part
-	part $translation_part pos $mx $my $mz type 0
+	# #puts $min_part
+	# part $translation_part pos $mx $my $mz type 0
 
-	#set translation_part [expr $N*0.5]
-	set tx [lindex [part $translation_part print pos] 0]
-	set ty [lindex [part $translation_part print pos] 1]
-	set tz [lindex [part $translation_part print pos] 2]
+	# #set translation_part [expr $N*0.5]
+	# set tx [lindex [part $translation_part print pos] 0]
+	# set ty [lindex [part $translation_part print pos] 1]
+	# set tz [lindex [part $translation_part print pos] 2]
 	
 
-	#part $min_part fix
-	# for {set i 0} {$i < $N} {incr i} {
-	# 	part $i bond delete
+	# #part $min_part fix
+	# # for {set i 0} {$i < $N} {incr i} {
+	# # 	part $i bond delete
+	# # }
+	# set tr [expr sqrt($tx*$tx + $ty*$ty + $tz*$tz)]
+
+	# for { set i [expr 0] } { $i < $N } { incr i } {
+	# 	if {$i != $translation_part} {
+	# 		set ix [expr [lindex [part $i print pos] 0] - $px + $tx] 
+	# 		set iy [expr [lindex [part $i print pos] 1] - $py + $ty] 
+	# 		set iz [expr [lindex [part $i print pos] 2] - $pz + $tz] 
+	# 		set ir [expr sqrt($ix*$ix + $iy*$iy + $iz*$iz)]
+	# 		#puts "$ix $iy $iz"
+	# 		#puts $ir
+	# 		part $i pos $ix $iy $iz type 0 
+	# 	}
 	# }
-	set tr [expr sqrt($tx*$tx + $ty*$ty + $tz*$tz)]
-
-	for { set i [expr 0] } { $i < $N } { incr i } {
-		if {$i != $translation_part} {
-			set ix [expr [lindex [part $i print pos] 0] - $px + $tx] 
-			set iy [expr [lindex [part $i print pos] 1] - $py + $ty] 
-			set iz [expr [lindex [part $i print pos] 2] - $pz + $tz] 
-			set ir [expr sqrt($ix*$ix + $iy*$iy + $iz*$iz)]
-			#puts "$ix $iy $iz"
-			#puts $ir
-			part $i pos $ix $iy $iz type 0 
-		}
-	}
 
 	
-	set zlist {}
-	set zmincheck 32768
-	for {set i 0} {$i < $N} {incr i} {
-		set z [lindex [part $i print pos] 2]
-		if {$z < $zmincheck} {
-			set zmincheck $z
-		}
-	}
+	# set zlist {}
+	# set zmincheck 32768
+	# for {set i 0} {$i < $N} {incr i} {
+	# 	set z [lindex [part $i print pos] 2]
+	# 	if {$z < $zmincheck} {
+	# 		set zmincheck $z
+	# 	}
+	# }
 
 	if {$zmincheck < [expr $cz + $lj_cutoff + 0.5 + 0.5] } {
 		puts "Bad overlap with pore"
@@ -234,7 +234,7 @@ while {$flag == 0} {
 
 	puts "positionflag $position_flag"
 	
-	set drawrand 0
+	#set drawrand 0
 
 	for {set i 0} {$i < $N} {incr i} {
 		part $i ext_force $force 1.6 1.6
