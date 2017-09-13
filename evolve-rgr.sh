@@ -16,8 +16,8 @@ do
 	mkdir -p data/${filename}_$N
 	mkdir -p logs/${filename}_$N
 
-	for transportdist in 20 40 60
-	do
+	for transportdist in 20 40 60 110
+ 	do
 		for i in {00..99}
 		do
 			rseed=${N}${i}${rseed_suffix}
