@@ -21,7 +21,7 @@ do
 		for i in {00..99}
 		do
 			rseed=${N}${i}${rseed_suffix}
-			time="02:00:00"
+			time="02:30:00"
 			jobname="rgr-map_${N}_${rseed}"
 			log="logs/${filename}_$N/log_$rseed.out"
 			sbatch --mem=$mem --time=$time --job-name=$jobname --output=$log graham-job-submit.sh $N $rseed $filename $transportdist
