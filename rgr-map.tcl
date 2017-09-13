@@ -213,14 +213,14 @@ while {$flag == 0} {
 	# }
 
 	
-	# set zlist {}
-	# set zmincheck 32768
-	# for {set i 0} {$i < $N} {incr i} {
-	# 	set z [lindex [part $i print pos] 2]
-	# 	if {$z < $zmincheck} {
-	# 		set zmincheck $z
-	# 	}
-	# }
+	set zlist {}
+	set zmincheck 32768
+	for {set i 0} {$i < $N} {incr i} {
+		set z [lindex [part $i print pos] 2]
+		if {$z < $zmincheck} {
+			set zmincheck $z
+		}
+	}
 
 	if {$zmincheck < [expr $cz + $lj_cutoff + 0.5 + 0.5] } {
 		puts "Bad overlap with pore"
