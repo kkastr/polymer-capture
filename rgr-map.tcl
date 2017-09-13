@@ -235,9 +235,10 @@ while {$flag == 0} {
 	puts "positionflag $position_flag"
 	
 	#set drawrand 0
-
-	for {set i 0} {$i < $N} {incr i} {
-		part $i ext_force $force 1.6 1.6
+	if {$transportdist < 100} {
+		for {set i 0} {$i < $N} {incr i} {
+			part $i ext_force $force 1.6 1.6
+		}
 	}
 
 	part $fixed_N fix
@@ -258,8 +259,8 @@ while {$flag == 0} {
 	puts $rgr_csv "$rg_at_equil"
 	#puts $rg_at_equil
 	#puts "I'm back in the first while"
-	set tstart $t
-
+	#set tstart $t
+	set position_flag 1
 	incr t
 	if {$t > 1000} {
 		set flag 1
