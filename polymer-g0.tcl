@@ -135,7 +135,7 @@ constraint pore center [expr $cx] [expr $cy] [expr $cz] axis 0 0 1 radius $rpore
 for { set i 0 } { $i < $N } { incr i } {
 	set x [expr $cx - $N/2 + $i]
 	set y [expr $cy]
-	set z [expr $cz  + 100]
+	set z [expr $cz  + $transportdist]
 	part $i pos $x $y $z type 0 
 
 
