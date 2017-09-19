@@ -177,6 +177,11 @@ set ncontact 0
 set st 0
 
 
+
+set rmatrix_csv [open "data/${filename}_$N/rmatrix-${filename}-$N-$rseed.csv" "a"]
+set rgrmatrix_csv [open "data/${filename}_$N/rgrmatrix-${filename}-$N-$rseed.csv" "a"]
+set rgpmatrix_csv [open "data/${filename}_$N/rgpmatrix-${filename}-$N-$rseed.csv" "a"]
+
 #set positions_csv [open "data/${filename}_$N/traj-${filename}-$N-$rseed.csv" "a"]
 while {$flag == 0} {
 
@@ -526,34 +531,33 @@ while {$flag == 0} {
 
 
 
-		##### FIX FILE IO HERE
 		if {$t_trans != 0} {
 			set t_trans 0
 
 			for {set k 0} { $k < $Nr} {incr k} {
-				puts ""
+				puts $rmatrix_csv ""
 				for {set l 0} {$l < $Nz} {incr l} {
-					puts -nonewline "[set rarray($k,$l)] \ "
+					puts -nonewline  $rmatrix_csv "[set rarray($k,$l)] \ "
 				}
 			}
-			puts " Next Event "
+			puts $rmatrix_csv " Next Event "
 
 
 			for {set k 0} { $k < $Nr} {incr k} {
-				puts ""
+				puts $rgrmatrix_csv ""
 				for {set l 0} {$l < $Nz} {incr l} {
-					puts -nonewline "[set rgrarray($k,$l)] \ "
+					puts -nonewline $rgrmatrix_csv "[set rgrarray($k,$l)] \ "
 				}
 			}
-			puts " Next Event "
+			puts $rgrmatrix_csv " Next Event "
 
 			for {set k 0} { $k < $Nr} {incr k} {
-				puts ""
+				puts $rgpmatrix_csv ""
 				for {set l 0} {$l < $Nz} {incr l} {
-					puts -nonewline "[set rgparray($k,$l)] \ "
+					puts -nonewline $rgpmatrix_csv "[set rgparray($k,$l)] \ "
 				}
 			}
-			puts " Next Event "
+			puts $rgpmatrix_csv " Next Event "
 
 		}
 		integrate 100
@@ -567,3 +571,6 @@ while {$flag == 0} {
 #close $part_pos_z
 # close $metric_csv
 #close $positions_csv
+close rmatrix_csv
+close rgrmatrix_csv 
+close rgpmatrix_csv 
