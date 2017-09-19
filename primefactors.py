@@ -16,4 +16,4 @@ def prime_factors(n):
         factors.append(n)
     return factors
 
-print np.sum(prime_factors(int(sys.argv[1]))) + np.max(prime_factors(int(sys.argv[1])))
+print np.sum(prime_factors(int(sys.argv[1]))) + np.max(prime_factors(int(sys.argv[1]))) + 5
