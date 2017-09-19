@@ -193,7 +193,7 @@ while {$flag == 0} {
 	for { set i 0 } { $i < $N } { incr i } {
 		set x [expr $cx - $N/2 + $i]
 		set y [expr $cy]
-		set z [expr $cz  + 100]
+		set z [expr $cz  + $transportdist]
 		part $i pos $x $y $z type 0 
 		}
 
@@ -244,73 +244,73 @@ while {$flag == 0} {
 	
 	#puts $drawrand
 
-	set rlist {}
+	# set rlist {}
 
-	for {set j 0} {$j < $N} {incr j} {
-		set x [lindex [part $j print pos] 0]
-		set y [lindex [part $j print pos] 1]
-	    set z [lindex [part $j print pos] 2]
-	    set r [expr sqrt($x*$x + $y*$y + $z*$z)]
-	    lappend rlist $r
-	}
+	# for {set j 0} {$j < $N} {incr j} {
+	# 	set x [lindex [part $j print pos] 0]
+	# 	set y [lindex [part $j print pos] 1]
+	#     set z [lindex [part $j print pos] 2]
+	#     set r [expr sqrt($x*$x + $y*$y + $z*$z)]
+	#     lappend rlist $r
+	# }
 
-	set rmin [::tcl::mathfunc::min {*}$rlist]
-	set rmax [::tcl::mathfunc::max {*}$rlist]
-
-
-	for {set i 0} {$i < $N} {incr i} {
-	    set z [lindex [part $i print pos] 2]
-	    set y [lindex [part $i print pos] 1]
-	    set x [lindex [part $i print pos] 0]
-	    set r [expr sqrt($x*$x + $y*$y + $z*$z)]
-	    if {$r == $rmin} {
-	      set min_part $i
-	    } 
-	}
+	# set rmin [::tcl::mathfunc::min {*}$rlist]
+	# set rmax [::tcl::mathfunc::max {*}$rlist]
 
 
-	set randlist [randgen]
+	# for {set i 0} {$i < $N} {incr i} {
+	#     set z [lindex [part $i print pos] 2]
+	#     set y [lindex [part $i print pos] 1]
+	#     set x [lindex [part $i print pos] 0]
+	#     set r [expr sqrt($x*$x + $y*$y + $z*$z)]
+	#     if {$r == $rmin} {
+	#       set min_part $i
+	#     } 
+	# }
 
 
-	set px [lindex [part $min_part print pos] 0]
-	set py [lindex [part $min_part print pos] 1]
-	set pz [lindex [part $min_part print pos] 2]
+	# set randlist [randgen]
 
 
-	set mx [expr $cx + $lj_cutoff + $transportdist*[lindex $randlist 0]]
-	set my [expr $cy + $lj_cutoff + $transportdist*[lindex $randlist 1]]
-	set mz [expr $cz + $lj_cutoff + $transportdist*[lindex $randlist 2]]
+	# set px [lindex [part $min_part print pos] 0]
+	# set py [lindex [part $min_part print pos] 1]
+	# set pz [lindex [part $min_part print pos] 2]
 
-	#puts "$mx $my $mz"
-	set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
-	set mr [expr sqrt($mr2)]
-	#puts $mr
 
-	#puts $min_part
-	part $min_part pos $mx $my $mz type 0
+	# set mx [expr $cx + $lj_cutoff + $transportdist*[lindex $randlist 0]]
+	# set my [expr $cy + $lj_cutoff + $transportdist*[lindex $randlist 1]]
+	# set mz [expr $cz + $lj_cutoff + $transportdist*[lindex $randlist 2]]
 
-	set tx [lindex [part $min_part print pos] 0]
-	set ty [lindex [part $min_part print pos] 1]
-	set tz [lindex [part $min_part print pos] 2]
+	# #puts "$mx $my $mz"
+	# set mr2  [expr ($mx - $cx)*($mx -$cx) + ($my - $cy)*($my -$cy) + ($mz - $cz)*($mz -$cz)]
+	# set mr [expr sqrt($mr2)]
+	# #puts $mr
+
+	# #puts $min_part
+	# part $min_part pos $mx $my $mz type 0
+
+	# set tx [lindex [part $min_part print pos] 0]
+	# set ty [lindex [part $min_part print pos] 1]
+	# set tz [lindex [part $min_part print pos] 2]
 	
 
-	#part $min_part fix
-	# for {set i 0} {$i < $N} {incr i} {
-	# 	part $i bond delete
-	# }
-	set tr [expr sqrt($tx*$tx + $ty*$ty + $tz*$tz)]
+	# #part $min_part fix
+	# # for {set i 0} {$i < $N} {incr i} {
+	# # 	part $i bond delete
+	# # }
+	# set tr [expr sqrt($tx*$tx + $ty*$ty + $tz*$tz)]
 
-	for { set i [expr 0] } { $i < $N } { incr i } {
-		if {$i != $min_part} {
-			set ix [expr [lindex [part $i print pos] 0] - $px + $tx] 
-			set iy [expr [lindex [part $i print pos] 1] - $py + $ty] 
-			set iz [expr [lindex [part $i print pos] 2] - $pz + $tz] 
-			set ir [expr sqrt($ix*$ix + $iy*$iy + $iz*$iz)]
-			#puts "$ix $iy $iz"
-			#puts $ir
-			part $i pos $ix $iy $iz type 0 
-			}
-		}
+	# for { set i [expr 0] } { $i < $N } { incr i } {
+	# 	if {$i != $min_part} {
+	# 		set ix [expr [lindex [part $i print pos] 0] - $px + $tx] 
+	# 		set iy [expr [lindex [part $i print pos] 1] - $py + $ty] 
+	# 		set iz [expr [lindex [part $i print pos] 2] - $pz + $tz] 
+	# 		set ir [expr sqrt($ix*$ix + $iy*$iy + $iz*$iz)]
+	# 		#puts "$ix $iy $iz"
+	# 		#puts $ir
+	# 		part $i pos $ix $iy $iz type 0 
+	# 		}
+	# 	}
 
 	
 	set zlist {}
