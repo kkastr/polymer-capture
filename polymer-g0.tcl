@@ -423,7 +423,7 @@ while {$flag == 0} {
 		
 		# puts "$p1x $p1y $p1z"
 		set idx1 [expr int( $rcom )]
-		set idx2 [expr int( $zcom - 250 )] 
+		set idx2 [expr abs(int( $zcom - 250 ))] 
 
 		# puts $idx1
 		# puts $idx2
