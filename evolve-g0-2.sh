@@ -21,7 +21,7 @@ do
 	for i in {00..10}
 	do
 		rseed=${N}${i}${rseed_suffix}
-		time="$(python primefactors.py $N):00:00"
+		time="$(python primefactors2.py $N):00:00"
 		jobname="grid2_${N}_${rseed}"
 		log="logs/${filename}_$N/log_$rseed.out"
 		sbatch --mem=$mem --time=$time --job-name=$jobname --output=$log graham-job-submit.sh $N $rseed $filename
