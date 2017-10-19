@@ -9,7 +9,7 @@ int main() {
 FILE *f;
 
 
-f = fopen("trim10.csv","r");
+f = fopen("failr10.txt","r");
 
 int lines;
 float c;
@@ -112,7 +112,7 @@ while (true) {
 
 
 	int v = 0;
-	int n = 5;
+	int n = 10;
 	while (v < lines  && n != (double)ceil( (double) array[v])) {
 		v++;
 	} 
@@ -127,7 +127,7 @@ while (true) {
 	
 
 	int u = 0;
-	while (u < lines  && 10 != (double)floor( (double) slc[u])) {
+	while (u < lines  && 20!= (double)floor( (double) slc[u])) {
 		u++;
 	} 
 	printf("back above n at index: %d \n",u);
